@@ -1,21 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 import { ICoordinates, IAirport, IFlight } from "./interfaces";
+import {SeatClass} from "./types";
+import AirportSchema from "./Airport";
 
-const CoordinatesSchema = new Schema<ICoordinates>(
+export const CoordinatesSchema = new Schema<ICoordinates>(
     {
         latitude: { type: Number, required: true },
         longitude: { type: Number, required: true },
-    },
-    { _id: false }
-);
-
-const AirportSchema = new Schema<IAirport>(
-    {
-        iataCode: { type: String, required: true, uppercase: true, trim: true },
-        name: { type: String, required: true, trim: true },
-        city: { type: String, required: true, trim: true },
-        country: { type: String, required: true, trim: true },
-        coordinates: { type: CoordinatesSchema, required: true },
     },
     { _id: false }
 );
@@ -48,6 +39,7 @@ FlightSchema.index({ "departure.country": 1 });
 FlightSchema.index({ "arrival.country": 1 });
 FlightSchema.index({ airline: 1 });
 
-const Flight = mongoose.model<IFlight>("Flight", FlightSchema);
+export const Flight =
+    mongoose.model<IFlight>("Flight", FlightSchema);
 
 export default Flight;

@@ -1,5 +1,7 @@
 // Seat-Klasse als Union Type
-type SeatClass = "Economy" | "Business" | "First";
+import {IFlight} from "./interfaces";
+
+export type SeatClass = "Economy" | "Business" | "First";
 
 // Request Body zum Erstellen eines Fluges
-type CreateFlightDTO = Omit<Flight, "_id" | "createdAt">;
+export type CreateFlightDTO = Omit<IFlight, "createdAt">;

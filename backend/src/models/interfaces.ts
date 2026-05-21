@@ -1,6 +1,7 @@
-// Koordinaten eines Ortes
 import {Document} from "mongoose";
+import {SeatClass} from "./types";
 
+// Koordinaten eines Ortes
 export interface ICoordinates {
     latitude: number;
     longitude: number;
