@@ -1,10 +1,10 @@
-import express, {Router} from "express";
+import express, { Request, Response, Router } from "express";
 import Airport from "../models/Airport";
 
 const router: Router = express.Router();
 
 // Flughäfen per IATA-Code oder Name suchen
-router.get("/search", async (req, res) => {
+router.get("/search", async (req: Request, res: Response) => {
     const searchQuery = req.query.q as string;
 
     if (!searchQuery) {
