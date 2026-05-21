@@ -1,42 +1,43 @@
 // Koordinaten eines Ortes
-interface Coordinates {
+import {Document} from "mongoose";
+
+export interface ICoordinates {
     latitude: number;
     longitude: number;
 }
 
 // Flughafen
-interface Airport {
+export interface IAirport {
     iataCode: string;
     name: string;
     city: string;
     country: string;
-    coordinates: Coordinates;
+    coordinates: ICoordinates;
 }
 
 // Flug-Eintrag
-interface Flight {
-    _id?: string;
+export interface IFlight extends Document {
     flightNumber: string;
     airline: string;
-    departure: Airport;
-    arrival: Airport;
-    date: string;
+    departure: IAirport;
+    arrival: IAirport;
+    date: Date;
     durationMinutes: number;
     distanceKm: number;
     seatClass: SeatClass;
     notes?: string;
-    createdAt?: string;
+    createdAt?: Date;
 }
 
 // API Response Wrapper
-interface ApiResponse<T> {
+export interface IApiResponse<T> {
     success: boolean;
     data: T;
     message?: string;
 }
 
 // Filter-State in der App
-interface FlightFilter {
+export interface IFlightFilter {
     searchQuery: string;
     seatClass: SeatClass | "All";
     year: number | null;
@@ -44,7 +45,7 @@ interface FlightFilter {
 }
 
 // Statistiken
-interface FlightStats {
+export interface IFlightStats {
     totalFlights: number;
     totalDistanceKm: number;
     totalDurationMinutes: number;

@@ -51,3 +51,6 @@ interface FlightStats {
     mostVisitedCountry: string;
     uniqueAirports: number;
 }
+
+export class IFlight {
+}
