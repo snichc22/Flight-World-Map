@@ -1,15 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { ICoordinates, IAirport, IFlight } from "./interfaces";
 import {SeatClass} from "./types";
-import AirportSchema from "./Airport";
-
-export const CoordinatesSchema = new Schema<ICoordinates>(
-    {
-        latitude: { type: Number, required: true },
-        longitude: { type: Number, required: true },
-    },
-    { _id: false }
-);
+import { AirportSchema } from "./Airport";
 
 const FlightSchema = new Schema<IFlight>(
     {

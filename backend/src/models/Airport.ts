@@ -1,8 +1,15 @@
 import mongoose, {Schema} from "mongoose";
-import {IAirport} from "./interfaces";
-import {CoordinatesSchema} from "./Flight";
+import {IAirport, ICoordinates} from "./interfaces";
 
-const AirportSchema = new Schema<IAirport>(
+export const CoordinatesSchema = new Schema<ICoordinates>(
+    {
+        latitude: { type: Number, required: true },
+        longitude: { type: Number, required: true },
+    },
+    { _id: false }
+);
+
+export const AirportSchema = new Schema<IAirport>(
     {
         iataCode: { type: String, required: true, uppercase: true, trim: true },
         name: { type: String, required: true, trim: true },
