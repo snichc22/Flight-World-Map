@@ -6,7 +6,7 @@ const router: Router = express.Router();
 // Alle Flüge abrufen (mit optionalen Query-Parametern: ?year=, ?class=, ?search=)
 router.get("/", async (req: Request, res: Response) => {
     try {
-        const { year, class: flightClass, search } = req.query;
+        const { year, class: flightClass, search, country } = req.query;
         let query: any = {};
 
         if (year) {
@@ -19,14 +19,28 @@ router.get("/", async (req: Request, res: Response) => {
             query.seatClass = flightClass;
         }
 
+        if (country) {
+            query.$or = [
+                { "departure.country": country },
+                { "arrival.country": country }
+            ];
+        }
+
         if (search) {
             const searchRegex = new RegExp(search as string, "i");
-            query.$or = [
+            const searchCriteria = [
                 { flightNumber: searchRegex },
                 { airline: searchRegex },
                 { "departure.name": searchRegex },
                 { "arrival.name": searchRegex }
             ];
+
+            if (query.$or) {
+                query.$and = [ { $or: query.$or }, { $or: searchCriteria } ];
+                delete query.$or;
+            } else {
+                query.$or = searchCriteria;
+            }
         }
 
         const flights =
