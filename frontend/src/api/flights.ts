@@ -12,12 +12,12 @@ export async function getFlights(params?: {
         await api.get<IApiResponse<IFlight[]>>("/flights", {
             params: {
                 year: params?.year ?? undefined,
-                class: params?.seatClass ? params.seatClass : undefined,
+                class: params?.seatClass && params.seatClass !== "All" ? params.seatClass : undefined,
                 search: params?.search ?? undefined,
                 country: params?.country ?? undefined,
             },
         });
-    return response.data.data;
+    return (response.data as any).data ?? response.data;
 }
 
 export async function createFlight(payload: CreateFlightDTO) {
