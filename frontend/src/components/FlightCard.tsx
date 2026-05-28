@@ -30,7 +30,7 @@ export const FlightCard = ({flight, selected, onPress, onDelete}: Props) => {
                             {flight.arrival.country}
                         </Text>
                         <Text style={styles.detailText}>
-                            {flight.date.toLocaleDateString()} - {flight.seatClass}
+                            {new Date(flight.date).toLocaleDateString()} - {flight.seatClass}
                         </Text>
                         <Text style={styles.detailText}>
                             {flight.distanceKm.toFixed(0)} km - {flight.durationMinutes} min
