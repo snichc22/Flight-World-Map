@@ -5,7 +5,7 @@ import {CreateFlightDTO} from "../models/types";
 export async function getFlights(params?: {
     year?: number | null;
     seatClass?: string;
-    search?: string;
+    searchQuery?: string;
     country?: string | null;
 }) {
     const response =
@@ -13,7 +13,7 @@ export async function getFlights(params?: {
             params: {
                 year: params?.year ?? undefined,
                 class: params?.seatClass && params.seatClass !== "All" ? params.seatClass : undefined,
-                search: params?.search ?? undefined,
+                search: params?.searchQuery ?? undefined,
                 country: params?.country ?? undefined,
             },
         });

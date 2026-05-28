@@ -50,6 +50,15 @@ export default function App() {
                 if (!prev) return data[0] ?? null;
                 return data.find((f: IFlight) => f._id === prev._id) ?? data[0] ?? null;
             });
+
+            setCountries((prev) => {
+                const cSet = new Set(prev);
+                data.forEach((f: IFlight) => {
+                    if (f.departure?.country) cSet.add(f.departure.country);
+                    if (f.arrival?.country) cSet.add(f.arrival.country);
+                });
+                return Array.from(cSet).sort();
+            });
         } catch (e: any) {
             setError(e?.response?.data?.message ?? e.message ?? "Failed to load flights");
         } finally {
