@@ -32,7 +32,9 @@ router.get("/", async (req: Request, res: Response) => {
                 { flightNumber: searchRegex },
                 { airline: searchRegex },
                 { "departure.name": searchRegex },
-                { "arrival.name": searchRegex }
+                { "arrival.name": searchRegex },
+                { "departure.iataCode": searchRegex },
+                { "arrival.iataCode": searchRegex }
             ];
 
             if (query.$or) {
