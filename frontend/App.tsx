@@ -213,7 +213,7 @@ export default function App() {
                     ) : (
                         flights.map((flight) => (
                             <FlightCard
-                                key={flight._id?.toString() ?? `${flight.flightNumber}-${flight.date?.toLocaleDateString()}`}
+                                key={flight._id?.toString() ?? `${flight.flightNumber}-${flight.date}`}
                                 flight={flight}
                                 selected={selectedFlight?._id?.toString() === flight._id?.toString()}
                                 onPress={() => setSelectedFlight(flight)}
