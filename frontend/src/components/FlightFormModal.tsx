@@ -6,7 +6,6 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import {CreateFlightDTO, SeatClass} from "../models/types";
 import {IAirport} from "../models/interfaces";
 import {styles} from "../styles/flightFormModal.styles";
-import {useAirportsStore} from "../store/airports.store";
 
 type Props = {
     visible: boolean;
@@ -22,7 +21,8 @@ const EMPTY_AIRPORT: IAirport = {
     coordinates: {latitude: 0, longitude: 0},
 };
 
-const {airports, setAirports} = useAirportsStore();
+// const {airports, setAirports} = useAirportsStore();
+let airports: IAirport[] | null = null;
 
 export function FlightFormModal({visible, onClose, onSubmit}: Props) {
     const [flightNumber, setFlightNumber] = useState("");
@@ -52,7 +52,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
         try {
             if (!airports) {
                 const res = await fetch("https://raw.githubusercontent.com/mwgg/Airports/master/airports.json");
-                setAirports(await res.json());
+                airports = await res.json();
             }
 
             const upperIata = iataCode.toUpperCase();
