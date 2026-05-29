@@ -5,21 +5,12 @@ import {FlightCard} from "./src/components/FlightCard";
 import {FlightFormModal} from "./src/components/FlightFormModal";
 import {IFlight, IFlightFilter, IFlightStats} from "./src/models/interfaces";
 import {CreateFlightDTO} from "./src/models/types";
-import {
-    ActivityIndicator,
-    Alert,
-    Animated,
-    Pressable,
-    SafeAreaView,
-    Text,
-    TextInput,
-    View
-} from "react-native";
+import {ActivityIndicator, Alert, Animated, Pressable, SafeAreaView, Text, TextInput, View} from "react-native";
 import {Picker} from "@react-native-picker/picker";
 import {styles} from "./src/styles/app.styles";
-import ScrollView = Animated.ScrollView;
 
 const StyledPicker = Picker as any;
+const ScrollView = Animated.ScrollView;
 
 export default function App() {
     const [flights, setFlights] = useState<IFlight[]>([]);
@@ -35,7 +26,6 @@ export default function App() {
     const [showForm, setShowForm] = useState(false);
     const [stats, setStats] = useState<IFlightStats | null>(null);
     const [yearInput, setYearInput] = useState("");
-    const [countryInput, setCountryInput] = useState("");
     const [countries, setCountries] = useState<string[]>([]);
 
     async function loadFlights() {
@@ -49,15 +39,6 @@ export default function App() {
             setSelectedFlight((prev) => {
                 if (!prev) return data[0] ?? null;
                 return data.find((f: IFlight) => f._id === prev._id) ?? data[0] ?? null;
-            });
-
-            setCountries((prev) => {
-                const cSet = new Set(prev);
-                data.forEach((f: IFlight) => {
-                    if (f.departure?.country) cSet.add(f.departure.country);
-                    if (f.arrival?.country) cSet.add(f.arrival.country);
-                });
-                return Array.from(cSet).sort();
             });
         } catch (e: any) {
             setError(e?.response?.data?.message ?? e.message ?? "Failed to load flights");
@@ -127,8 +108,7 @@ export default function App() {
                     <TextInput
                         placeholder="Search airline, city, airport, ..."
                         value={filter.searchQuery}
-                        onChangeText={(searchQuery) => setFilter((prev) =>
-                            ({...prev, searchQuery}))}
+                        onChangeText={(searchQuery) => setFilter((prev) => ({...prev, searchQuery}))}
                         style={styles.input}
                     />
 
@@ -140,8 +120,7 @@ export default function App() {
                                 onChangeText={(v) => {
                                     setYearInput(v);
                                     const year = v.trim() ? Number(v) : null;
-                                    setFilter((prev) =>
-                                        ({...prev, year: Number.isFinite(year ?? NaN) ? year : null}));
+                                    setFilter((prev) => ({...prev, year: Number.isFinite(year ?? NaN) ? year : null}));
                                 }}
                                 keyboardType="numeric"
                                 style={styles.input}
@@ -153,8 +132,7 @@ export default function App() {
                                 <StyledPicker
                                     style={styles.picker}
                                     selectedValue={filter.seatClass}
-                                    onValueChange={(seatClass: any) => setFilter((prev) =>
-                                        ({...prev, seatClass}))}
+                                    onValueChange={(seatClass: any) => setFilter((prev) => ({...prev, seatClass}))}
                                 >
                                     <StyledPicker.Item label="All Classes" value="All"/>
                                     <StyledPicker.Item label="Economy" value="Economy"/>
@@ -212,7 +190,7 @@ export default function App() {
                     </Text>
 
                     {loading ? (
-                        <View style={{paddingVertical: 24}}>
+                        <View style={styles.loadingWrapper}>
                             <ActivityIndicator size="large"/>
                         </View>
                     ) : error ? (
@@ -228,9 +206,7 @@ export default function App() {
                                 onPress={() => setSelectedFlight(flight)}
                                 onDelete={() =>
                                     Alert.alert("Delete flight", "Remove this flight permanently?", [
-                                        {
-                                            text: "Cancel",
-                                            style: "cancel"},
+                                        {text: "Cancel", style: "cancel"},
                                         {
                                             text: "Delete",
                                             style: "destructive",

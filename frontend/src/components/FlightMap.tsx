@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import { View, Text } from "react-native";
-import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from "react-leaflet";
+import React, {useEffect} from "react";
+import {Text, View} from "react-native";
+import {MapContainer, Marker, Polyline, Popup, TileLayer, useMap} from "react-leaflet";
 import L from "leaflet";
 
-import { IFlight } from "../models/interfaces";
-import { interpolateGreatCircle } from "../utils/greatCircle";
-import { flightMapStyles } from "../styles/flightMap.styles";
+import {IFlight} from "../models/interfaces";
+import {interpolateGreatCircle} from "../utils/greatCircle";
+import {flightMapStyles} from "../styles/flightMap.styles";
 
 if (typeof document !== "undefined") {
     const leafletCssUrl = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
@@ -30,7 +30,7 @@ type Props = {
     onSelectFlight?: (flight: IFlight) => void;
 };
 
-function FitMapToFlights({ flights }: { flights: IFlight[] }) {
+function FitMapToFlights({flights}: { flights: IFlight[] }) {
     const map = useMap();
 
     useEffect(() => {
@@ -46,28 +46,23 @@ function FitMapToFlights({ flights }: { flights: IFlight[] }) {
 
         const bounds = L.latLngBounds(points);
         if (bounds.isValid()) {
-            map.fitBounds(bounds, { padding: [40, 40] });
+            map.fitBounds(bounds, {padding: [40, 40]});
         }
     }, [flights, map]);
 
     return null;
 }
 
-export const FlightMap = ({ flights, selectedFlight, onSelectFlight }: Props) => {
+export const FlightMap = ({flights, selectedFlight, onSelectFlight}: Props) => {
     return (
         <View style={flightMapStyles.container}>
-            <MapContainer
-                center={[20, 0]}
-                zoom={2}
-                scrollWheelZoom
-                style={flightMapStyles.map}
-            >
+            <MapContainer center={[20, 0]} zoom={2} scrollWheelZoom style={flightMapStyles.map}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <FitMapToFlights flights={flights} />
+                <FitMapToFlights flights={flights}/>
 
                 {flights.map((flight) => {
                     const path = interpolateGreatCircle(
@@ -76,8 +71,7 @@ export const FlightMap = ({ flights, selectedFlight, onSelectFlight }: Props) =>
                         64
                     );
 
-                    const selected =
-                        selectedFlight?._id?.toString() === flight._id?.toString();
+                    const selected = selectedFlight?._id?.toString() === flight._id?.toString();
 
                     return (
                         <React.Fragment key={flight._id?.toString() ?? `${flight.flightNumber}-${flight.date}`}>
@@ -92,11 +86,11 @@ export const FlightMap = ({ flights, selectedFlight, onSelectFlight }: Props) =>
                                     flight.departure.coordinates.latitude,
                                     flight.departure.coordinates.longitude,
                                 ]}
-                                eventHandlers={{ click: () => onSelectFlight?.(flight) }}
+                                eventHandlers={{click: () => onSelectFlight?.(flight)}}
                             >
                                 <Popup>
                                     <strong>{flight.departure.iataCode} Departure</strong>
-                                    <br />
+                                    <br/>
                                     {flight.departure.name}
                                 </Popup>
                             </Marker>
@@ -106,11 +100,11 @@ export const FlightMap = ({ flights, selectedFlight, onSelectFlight }: Props) =>
                                     flight.arrival.coordinates.latitude,
                                     flight.arrival.coordinates.longitude,
                                 ]}
-                                eventHandlers={{ click: () => onSelectFlight?.(flight) }}
+                                eventHandlers={{click: () => onSelectFlight?.(flight)}}
                             >
                                 <Popup>
                                     <strong>{flight.arrival.iataCode} Arrival</strong>
-                                    <br />
+                                    <br/>
                                     {flight.arrival.name}
                                 </Popup>
                             </Marker>

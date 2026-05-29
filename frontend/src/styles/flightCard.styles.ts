@@ -1,22 +1,16 @@
 import {StyleSheet} from "react-native";
+import {globalStyles} from "./global.styles";
 
 export const styles = StyleSheet.create({
     card: {
-        backgroundColor: "#fff",
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 16,
-        padding: 14,
+        ...globalStyles.cardCompact,
         marginBottom: 12,
     },
     cardSelected: {
         backgroundColor: "#e8f2ff",
         borderColor: "#6aa9ff",
     },
-    cardContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
+    cardContainer: globalStyles.rowBetween,
     cardContent: {
         flex: 1,
         paddingRight: 12,

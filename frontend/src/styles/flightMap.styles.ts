@@ -1,15 +1,15 @@
-import { StyleSheet, Dimensions } from "react-native";
+import {Dimensions, StyleSheet} from "react-native";
+import {globalStyles} from "./global.styles";
 
-const { width } = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 export const mapHeight = Math.max(260, Math.min(420, width * 0.72));
 
 export const flightMapStyles = StyleSheet.create({
     container: {
-        width: "100%",
+        ...globalStyles.card,
         height: mapHeight,
         borderRadius: 18,
         overflow: "hidden",
-        backgroundColor: "#fff",
         position: "relative",
     },
     map: {
@@ -17,11 +17,8 @@ export const flightMapStyles = StyleSheet.create({
         height: "100%",
     },
     emptyOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "rgba(255,255,255,0.55)",
-        zIndex: 2,
+        ...globalStyles.centeredOverlay,
+        ...globalStyles.mutedOverlay,
     },
     emptyText: {
         fontWeight: "700",
