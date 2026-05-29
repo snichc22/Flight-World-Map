@@ -1,11 +1,12 @@
-import React, {useMemo, useState} from "react";
-import {Modal, Pressable, ScrollView, Text, TextInput, View,} from "react-native";
+import React, {useMemo, useState, useEffect} from "react";
+import {Modal, Pressable, ScrollView, Text, TextInput, View, Platform} from "react-native";
 import {Picker} from "@react-native-picker/picker";
 const StyledPicker = Picker as any;
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {CreateFlightDTO, SeatClass} from "../models/types";
 import {IAirport} from "../models/interfaces";
 import {styles} from "../styles/flightFormModal.styles";
+import {useAirportsStore} from "../store/airports.store";
 
 type Props = {
     visible: boolean;
@@ -21,6 +22,8 @@ const EMPTY_AIRPORT: IAirport = {
     coordinates: {latitude: 0, longitude: 0},
 };
 
+const {airports, setAirports} = useAirportsStore();
+
 export function FlightFormModal({visible, onClose, onSubmit}: Props) {
     const [flightNumber, setFlightNumber] = useState("");
     const [airline, setAirline] = useState("");
@@ -32,6 +35,50 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
     const [seatClass, setSeatClass] = useState<SeatClass>("Economy");
     const [notes, setNotes] = useState("");
     const [showDatePicker, setShowDatePicker] = useState(false);
+
+    useEffect(() => {
+        if (departure.iataCode.trim().length === 3) {
+            fetchAirportInfo(departure.iataCode.trim(), true);
+        }
+    }, [departure.iataCode]);
+
+    useEffect(() => {
+        if (arrival.iataCode.trim().length === 3) {
+            fetchAirportInfo(arrival.iataCode.trim(), false);
+        }
+    }, [arrival.iataCode]);
+
+    async function fetchAirportInfo(iataCode: string, isDeparture: boolean) {
+        try {
+            if (!airports) {
+                const res = await fetch("https://raw.githubusercontent.com/mwgg/Airports/master/airports.json");
+                setAirports(await res.json());
+            }
+
+            const upperIata = iataCode.toUpperCase();
+            const airport = airports!.find((a: any) => a.iata === upperIata) as any;
+
+            if (airport) {
+                const newInfo = {
+                    name: airport.name || "",
+                    city: airport.city || "",
+                    country: airport.country || "",
+                    coordinates: {
+                        latitude: airport.lat || 0,
+                        longitude: airport.lon || 0,
+                    }
+                };
+
+                if (isDeparture) {
+                    setDeparture(prev => ({...prev, ...newInfo}));
+                } else {
+                    setArrival(prev => ({...prev, ...newInfo}));
+                }
+            }
+        } catch (e) {
+            console.log("Failed to fetch airport data", e);
+        }
+    }
 
     const canSubmit = useMemo(() => {
         return (
@@ -72,27 +119,27 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
     return (
         <>
             <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-                <ScrollView contentContainerStyle={{padding: 18, paddingBottom: 40}}>
-                    <Text style={{fontSize: 22, fontWeight: "800", marginBottom: 14}}>
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <Text style={styles.modalTitle}>
                         Add Flight
                     </Text>
 
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
+                    <View style={styles.row}>
+                        <View style={styles.flex1}>
                             <Field label="Flight Number">
                                 <TextInput value={flightNumber} onChangeText={setFlightNumber} style={styles.inputStyle}/>
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Airline">
                                 <TextInput value={airline} onChangeText={setAirline} style={styles.inputStyle}/>
                             </Field>
                         </View>
                     </View>
 
-                    <Text style={{fontWeight: "700", marginTop: 10, marginBottom: 10, fontSize: 16, color: "#102a43"}}>Departure</Text>
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 0.4}}>
+                    <Text style={styles.sectionTitle}>Departure</Text>
+                    <View style={styles.row}>
+                        <View style={styles.flex04}>
                             <Field label="IATA">
                                 <TextInput
                                     value={departure.iataCode}
@@ -102,7 +149,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                 />
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Name">
                                 <TextInput
                                     value={departure.name}
@@ -113,8 +160,8 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         </View>
                     </View>
 
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
+                    <View style={styles.row}>
+                        <View style={styles.flex1}>
                             <Field label="City">
                                 <TextInput
                                     value={departure.city}
@@ -123,7 +170,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                 />
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Country">
                                 <TextInput
                                     value={departure.country}
@@ -134,8 +181,8 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         </View>
                     </View>
 
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
+                    <View style={styles.row}>
+                        <View style={styles.flex1}>
                             <Field label="Latitude">
                                 <TextInput
                                     value={String(departure.coordinates.latitude)}
@@ -150,7 +197,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                 />
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Longitude">
                                 <TextInput
                                     value={String(departure.coordinates.longitude)}
@@ -167,9 +214,9 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         </View>
                     </View>
 
-                    <Text style={{fontWeight: "700", marginTop: 10, marginBottom: 10, fontSize: 16, color: "#102a43"}}>Arrival</Text>
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 0.4}}>
+                    <Text style={styles.sectionTitle}>Arrival</Text>
+                    <View style={styles.row}>
+                        <View style={styles.flex04}>
                             <Field label="IATA">
                                 <TextInput
                                     value={arrival.iataCode}
@@ -179,7 +226,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                 />
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Name">
                                 <TextInput
                                     value={arrival.name}
@@ -190,8 +237,8 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         </View>
                     </View>
 
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
+                    <View style={styles.row}>
+                        <View style={styles.flex1}>
                             <Field label="City">
                                 <TextInput
                                     value={arrival.city}
@@ -200,7 +247,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                 />
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Country">
                                 <TextInput
                                     value={arrival.country}
@@ -211,8 +258,8 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         </View>
                     </View>
 
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
+                    <View style={styles.row}>
+                        <View style={styles.flex1}>
                             <Field label="Latitude">
                                 <TextInput
                                     value={String(arrival.coordinates.latitude)}
@@ -227,7 +274,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                 />
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Longitude">
                                 <TextInput
                                     value={String(arrival.coordinates.longitude)}
@@ -244,37 +291,55 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         </View>
                     </View>
 
-                    <Text style={{fontWeight: "700", marginTop: 10, marginBottom: 10, fontSize: 16, color: "#102a43"}}>Flight Details</Text>
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
+                    <Text style={styles.sectionTitle}>Flight Details</Text>
+                    <View style={styles.row}>
+                        <View style={styles.flex1}>
                             <Field label="Date">
-                                <Pressable
-                                    onPress={() => setShowDatePicker(true)}
-                                    style={[styles.inputStyle, {justifyContent: "center", minHeight: 46}]}
-                                >
-                                    <Text>
-                                        {new Date(date.getTime() - (date.getTimezoneOffset() * 60 * 1000))
-                                            .toISOString()
-                                            .slice(0, 10)}
-                                    </Text>
-                                </Pressable>
-                                {showDatePicker && (
-                                    <DateTimePicker
-                                        value={date}
-                                        mode="date"
-                                        display="default"
-                                        onChange={(_, selectedDate) => {
-                                            setShowDatePicker(false);
-                                            if (selectedDate) setDate(selectedDate);
-                                        }}
-                                    />
+                                {Platform.OS === 'web' ? (
+                                    React.createElement('input', {
+                                        type: 'date',
+                                        value: new Date(date.getTime() - (date.getTimezoneOffset() * 60 * 1000)).toISOString().slice(0, 10),
+                                        onChange: (e: any) => {
+                                            if (e.target.value) {
+                                                setDate(new Date(e.target.value));
+                                            }
+                                        },
+                                        style: styles.dateInputWeb as any
+                                    })
+                                ) : (
+                                    <>
+                                        {/* TODO: Test */}
+                                        <Pressable
+                                            onPress={() => setShowDatePicker(true)}
+                                            style={[styles.inputStyle, styles.datePressable]}
+                                        >
+                                            <Text>
+                                                {new Date(date.getTime() - (date.getTimezoneOffset() * 60 * 1000))
+                                                    .toISOString()
+                                                    .slice(0, 10)}
+                                            </Text>
+                                        </Pressable>
+                                        {showDatePicker && (
+                                            <DateTimePicker
+                                                value={date}
+                                                mode="date"
+                                                display="default"
+                                                onChange={(e, selectedDate) => {
+                                                    if (Platform.OS === 'android') {
+                                                        setShowDatePicker(false);
+                                                    }
+                                                    if (selectedDate) setDate(selectedDate);
+                                                }}
+                                            />
+                                        )}
+                                    </>
                                 )}
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Seat Class">
-                                <View style={[styles.pickerWrap, {height: 46, justifyContent: "center"}]}>
-                                    <StyledPicker style={{height: 46, width: "100%", color: "#102a43"}} selectedValue={seatClass} onValueChange={(v: SeatClass) => setSeatClass(v)}>
+                                <View style={[styles.pickerWrap, styles.pickerWrapCentered]}>
+                                    <StyledPicker style={styles.pickerStyle} selectedValue={seatClass} onValueChange={(v: SeatClass) => setSeatClass(v)}>
                                         <StyledPicker.Item label="Economy" value="Economy"/>
                                         <StyledPicker.Item label="Business" value="Business"/>
                                         <StyledPicker.Item label="First" value="First"/>
@@ -284,8 +349,8 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         </View>
                     </View>
 
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
+                    <View style={styles.row}>
+                        <View style={styles.flex1}>
                             <Field label="Duration (min)">
                                 <TextInput
                                     value={durationMinutes}
@@ -295,7 +360,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                 />
                             </Field>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flex1}>
                             <Field label="Distance (km)">
                                 <TextInput
                                     value={distanceKm}
@@ -311,14 +376,14 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                         <TextInput
                             value={notes}
                             onChangeText={setNotes}
-                            style={[styles.inputStyle, {minHeight: 90, textAlignVertical: "top"}]}
+                            style={[styles.inputStyle, styles.notesInput]}
                             multiline
                         />
                     </Field>
 
-                    <View style={{flexDirection: "row", gap: 12, marginTop: 10}}>
-                        <Pressable onPress={onClose} style={[styles.buttonStyle, {backgroundColor: "#eee"}]}>
-                            <Text style={{fontWeight: "700"}}>Cancel</Text>
+                    <View style={styles.buttonRow}>
+                        <Pressable onPress={onClose} style={[styles.buttonStyle, styles.cancelButton]}>
+                            <Text style={styles.cancelButtonText}>Cancel</Text>
                         </Pressable>
 
                         <Pressable
@@ -326,10 +391,10 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                             disabled={!canSubmit}
                             style={[
                                 styles.buttonStyle,
-                                {backgroundColor: canSubmit ? "#1976d2" : "#9ebee0"},
+                                canSubmit ? styles.saveButtonEnabled : styles.saveButtonDisabled,
                             ]}
                         >
-                            <Text style={{fontWeight: "700", color: "#fff"}}>Save</Text>
+                            <Text style={styles.saveButtonText}>Save</Text>
                         </Pressable>
                     </View>
                 </ScrollView>
@@ -340,10 +405,9 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
 
 function Field({label, children}: { label: string; children: React.ReactNode }) {
     return (
-        <View style={{marginBottom: 12}}>
-            <Text style={{fontWeight: "700", marginBottom: 6}}>{label}</Text>
+        <View style={styles.fieldContainer}>
+            <Text style={styles.fieldLabel}>{label}</Text>
             {children}
         </View>
     );
 }
-
