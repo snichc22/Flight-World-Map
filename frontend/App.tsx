@@ -5,7 +5,17 @@ import {FlightCard} from "./src/components/FlightCard";
 import {FlightFormModal} from "./src/components/FlightFormModal";
 import {IFlight, IFlightFilter, IFlightStats} from "./src/models/interfaces";
 import {CreateFlightDTO} from "./src/models/types";
-import {ActivityIndicator, Alert, Animated, Platform, Pressable, SafeAreaView, Text, TextInput, View} from "react-native";
+import {
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Platform,
+    Pressable,
+    SafeAreaView,
+    Text,
+    TextInput,
+    View
+} from "react-native";
 import {Picker} from "@react-native-picker/picker";
 import {styles} from "./src/styles/app.styles";
 
@@ -145,90 +155,99 @@ export default function App() {
                 <Text style={styles.title}>Flight World Map</Text>
 
                 {stats && (
-                    <View style={styles.statsCard}>
-                        <Stat label="Flights" value={stats.totalFlights.toString()}/>
-                        <Stat label="Distance" value={`${stats.totalDistanceKm.toFixed(0)} km`}/>
-                        <Stat label="Duration" value={`${stats.totalDurationMinutes.toFixed(0)} min`}/>
-                        <Stat label="Unique Airports" value={stats.uniqueAirports.toString()}/>
-                        <Stat label="Top Country" value={stats.mostVisitedCountry || "-"}/>
+                    <View style={[styles.card, styles.topLeftCard]}>
+                        <Text style={styles.sectionTitle}>Stats</Text>
+
+                        <View style={[styles.statsCard]}>
+                            <Stat label="Flights" value={stats.totalFlights.toString()}/>
+                            <Stat label="Distance" value={`${stats.totalDistanceKm.toFixed(0)} km`}/>
+                            <Stat label="Duration" value={`${stats.totalDurationMinutes.toFixed(0)} min`}/>
+                            <Stat label="Unique Airports" value={stats.uniqueAirports.toString()}/>
+                            <Stat label="Top Country" value={stats.mostVisitedCountry || "-"}/>
+                        </View>
                     </View>
                 )}
 
-                <View style={styles.controlsCard}>
-                    <Text style={styles.sectionTitle}>Filters</Text>
+                <View style={styles.topRightCard}>
+                    <View style={styles.card}>
+                        <Text style={styles.sectionTitle}>Filters</Text>
 
-                    <TextInput
-                        placeholder="Search airline, city, airport, ..."
-                        value={filter.searchQuery}
-                        onChangeText={(searchQuery) => setFilter((prev) => ({...prev, searchQuery}))}
-                        style={styles.input}
-                    />
+                        <TextInput
+                            placeholder="Search airline, city, airport, ..."
+                            value={filter.searchQuery}
+                            onChangeText={(searchQuery) => setFilter((prev) => ({...prev, searchQuery}))}
+                            style={styles.input}
+                        />
 
-                    <View style={styles.row}>
-                        <View style={styles.flex1}>
-                            <TextInput
-                                placeholder="Year (e.g. 2026)"
-                                value={yearInput}
-                                onChangeText={(v) => {
-                                    setYearInput(v);
-                                    const year = v.trim() ? Number(v) : null;
-                                    setFilter((prev) => ({...prev, year: Number.isFinite(year ?? NaN) ? year : null}));
-                                }}
-                                keyboardType="numeric"
-                                style={styles.input}
-                            />
-                        </View>
+                        <View style={styles.row}>
+                            <View style={styles.flex1}>
+                                <TextInput
+                                    placeholder="Year (e.g. 2026)"
+                                    value={yearInput}
+                                    onChangeText={(v) => {
+                                        setYearInput(v);
+                                        const year = v.trim() ? Number(v) : null;
+                                        setFilter((prev) => ({
+                                            ...prev,
+                                            year: Number.isFinite(year ?? NaN) ? year : null
+                                        }));
+                                    }}
+                                    keyboardType="numeric"
+                                    style={styles.input}
+                                />
+                            </View>
 
-                        <View style={styles.flex1}>
-                            <View style={styles.pickerWrap}>
-                                <StyledPicker
-                                    style={styles.picker}
-                                    selectedValue={filter.seatClass}
-                                    onValueChange={(seatClass: any) => setFilter((prev) => ({...prev, seatClass}))}
-                                >
-                                    <StyledPicker.Item label="All Classes" value="All"/>
-                                    <StyledPicker.Item label="Economy" value="Economy"/>
-                                    <StyledPicker.Item label="Business" value="Business"/>
-                                    <StyledPicker.Item label="First" value="First"/>
-                                </StyledPicker>
+                            <View style={styles.flex1}>
+                                <View style={styles.pickerWrap}>
+                                    <StyledPicker
+                                        style={styles.picker}
+                                        selectedValue={filter.seatClass}
+                                        onValueChange={(seatClass: any) => setFilter((prev) => ({...prev, seatClass}))}
+                                    >
+                                        <StyledPicker.Item label="All Classes" value="All"/>
+                                        <StyledPicker.Item label="Economy" value="Economy"/>
+                                        <StyledPicker.Item label="Business" value="Business"/>
+                                        <StyledPicker.Item label="First" value="First"/>
+                                    </StyledPicker>
+                                </View>
                             </View>
                         </View>
-                    </View>
 
-                    <View style={styles.pickerWrap}>
-                        <StyledPicker
-                            style={styles.picker}
-                            selectedValue={filter.country || ""}
-                            onValueChange={(country: any) => {
-                                setFilter((prev) => ({...prev, country: country || null}));
-                            }}
-                        >
-                            <StyledPicker.Item label="All Countries" value=""/>
-                            {countries.map((c) => (
-                                <StyledPicker.Item key={c} label={c} value={c}/>
-                            ))}
-                        </StyledPicker>
-                    </View>
+                        <View style={styles.pickerWrap}>
+                            <StyledPicker
+                                style={styles.picker}
+                                selectedValue={filter.country || ""}
+                                onValueChange={(country: any) => {
+                                    setFilter((prev) => ({...prev, country: country || null}));
+                                }}
+                            >
+                                <StyledPicker.Item label="All Countries" value=""/>
+                                {countries.map((c) => (
+                                    <StyledPicker.Item key={c} label={c} value={c}/>
+                                ))}
+                            </StyledPicker>
+                        </View>
 
-                    <View style={styles.row}>
-                        <Pressable style={styles.primaryButton} onPress={() => setShowForm(true)}>
-                            <Text style={styles.primaryButtonText}>Flug hinzufügen</Text>
-                        </Pressable>
+                        <View style={styles.row}>
+                            <Pressable style={styles.primaryButton} onPress={() => setShowForm(true)}>
+                                <Text style={styles.primaryButtonText}>Flug hinzufügen</Text>
+                            </Pressable>
 
-                        <Pressable
-                            style={styles.secondaryButton}
-                            onPress={() => {
-                                setFilter({searchQuery: "", seatClass: "All", year: null, country: null});
-                                setYearInput("");
-                            }}
-                        >
-                            <Text style={styles.secondaryButtonText}>Reset</Text>
-                        </Pressable>
+                            <Pressable
+                                style={styles.secondaryButton}
+                                onPress={() => {
+                                    setFilter({searchQuery: "", seatClass: "All", year: null, country: null});
+                                    setYearInput("");
+                                }}
+                            >
+                                <Text style={styles.secondaryButtonText}>Reset</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
 
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>Map</Text>
+                    <Text style={[styles.sectionTitle, styles.mapTitle]}>Map</Text>
                     <FlightMap
                         flights={flights}
                         selectedFlight={selectedFlight}

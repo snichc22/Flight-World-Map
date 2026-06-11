@@ -20,6 +20,13 @@ export const styles = StyleSheet.create({
     statLabel: globalStyles.statLabel,
     statValue: globalStyles.statValue,
     sectionTitle: globalStyles.sectionTitle,
+    mapTitle: {
+        alignSelf: "center",
+        textAlign: "center",
+        fontSize: 24,
+        fontWeight: "800",
+        marginBottom: 10,
+    },
     input: globalStyles.input,
     pickerWrap: globalStyles.pickerWrap,
     picker: globalStyles.picker,
@@ -32,4 +39,18 @@ export const styles = StyleSheet.create({
     errorText: globalStyles.errorText,
     emptyText: globalStyles.emptyText,
     loadingWrapper: {paddingVertical: 24},
+    topRightCard: {
+        position: "absolute",
+        top: 16,
+        right: 16,
+        width: "30%",
+        zIndex: 1,
+    },
+    topLeftCard: {
+        position: "absolute",
+        top: 16,
+        left: 16,
+        width: "30%",
+        zIndex: 1,
+    },
 });

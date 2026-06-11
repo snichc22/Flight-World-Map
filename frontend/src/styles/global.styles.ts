@@ -13,7 +13,7 @@ export const globalStyles = StyleSheet.create({
         elevation: 2,
     },
     sectionCard: {
-        backgroundColor: "#fff",
+        backgroundColor: "#f8f8f8",
         borderRadius: 20,
         padding: 14,
         marginBottom: 14,
@@ -31,15 +31,18 @@ export const globalStyles = StyleSheet.create({
         padding: 14,
     },
     title: {
-        fontSize: 30,
+        fontSize: 36,
         fontWeight: "800",
         color: "#102a43",
+        alignSelf: "center",
+        marginBottom: 14,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: "800",
         color: "#102a43",
         marginBottom: 10,
+        textAlign: "center",
     },
     input: {
         borderWidth: 1,
