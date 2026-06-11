@@ -6,6 +6,7 @@ export const globalStyles = StyleSheet.create({
         backgroundColor: "#fff",
         borderRadius: 20,
         padding: 14,
+        marginBottom: 14,
         shadowColor: "#000",
         shadowOpacity: 0.06,
         shadowRadius: 10,
@@ -13,7 +14,7 @@ export const globalStyles = StyleSheet.create({
         elevation: 2,
     },
     sectionCard: {
-        backgroundColor: "#f8f8f8",
+        backgroundColor: "#eee",
         borderRadius: 20,
         padding: 14,
         marginBottom: 14,

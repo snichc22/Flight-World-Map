@@ -152,10 +152,18 @@ export default function App() {
     return (
         <SafeAreaView style={styles.safe}>
             <ScrollView contentContainerStyle={styles.container}>
+                <View style={[styles.card, {height: "auto", flex: 1, minHeight: 400}]}>
+                    <FlightMap
+                        flights={flights}
+                        selectedFlight={selectedFlight}
+                        onSelectFlight={(flight) => setSelectedFlight(flight)}
+                    />
+                </View>
+
                 <Text style={styles.title}>Flight World Map</Text>
 
                 {stats && (
-                    <View style={[styles.card, styles.topLeftCard]}>
+                    <View style={[styles.sectionCard, styles.topLeftCard]}>
                         <Text style={styles.sectionTitle}>Stats</Text>
 
                         <View style={[styles.statsCard]}>
@@ -169,7 +177,7 @@ export default function App() {
                 )}
 
                 <View style={styles.topRightCard}>
-                    <View style={styles.card}>
+                    <View style={styles.sectionCard}>
                         <Text style={styles.sectionTitle}>Filters</Text>
 
                         <TextInput
@@ -244,15 +252,6 @@ export default function App() {
                             </Pressable>
                         </View>
                     </View>
-                </View>
-
-                <View style={styles.card}>
-                    <Text style={[styles.sectionTitle, styles.mapTitle]}>Map</Text>
-                    <FlightMap
-                        flights={flights}
-                        selectedFlight={selectedFlight}
-                        onSelectFlight={(flight) => setSelectedFlight(flight)}
-                    />
                 </View>
 
                 <View style={styles.card}>

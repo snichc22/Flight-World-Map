@@ -1,13 +1,12 @@
-import {Dimensions, StyleSheet} from "react-native";
+import {StyleSheet} from "react-native";
 import {globalStyles} from "./global.styles";
 
-const {width} = Dimensions.get("window");
-export const mapHeight = Math.max(260, Math.min(420, width * 0.72));
+export const getDynamicMapHeight = (height: number) =>
+    height * 0.6;
 
 export const flightMapStyles = StyleSheet.create({
     container: {
         ...globalStyles.card,
-        height: mapHeight,
         borderRadius: 18,
         overflow: "hidden",
         position: "relative",

@@ -1,11 +1,11 @@
 import React, {useEffect} from "react";
-import {Text, View} from "react-native";
+import {Text, useWindowDimensions, View} from "react-native";
 import {MapContainer, Marker, Polyline, Popup, TileLayer, useMap} from "react-leaflet";
 import L from "leaflet";
 
 import {IFlight} from "../models/interfaces";
 import {interpolateGreatCircle} from "../utils/greatCircle";
-import {flightMapStyles} from "../styles/flightMap.styles";
+import {flightMapStyles, getDynamicMapHeight} from "../styles/flightMap.styles";
 
 if (typeof document !== "undefined") {
     const leafletCssUrl = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
@@ -32,6 +32,7 @@ type Props = {
 
 function FitMapToFlights({flights}: { flights: IFlight[] }) {
     const map = useMap();
+    const {height, width} = useWindowDimensions();
 
     useEffect(() => {
         if (!flights.length) {
@@ -54,8 +55,10 @@ function FitMapToFlights({flights}: { flights: IFlight[] }) {
 }
 
 export const FlightMap = ({flights, selectedFlight, onSelectFlight}: Props) => {
+    const {height} = useWindowDimensions();
+
     return (
-        <View style={flightMapStyles.container}>
+        <View style={[flightMapStyles.container, {height: getDynamicMapHeight(height)}]}>
             <MapContainer center={[20, 0]} zoom={2} scrollWheelZoom style={flightMapStyles.map}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
