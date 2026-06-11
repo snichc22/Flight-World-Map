@@ -5,6 +5,20 @@ const toRad =
 const toDeg =
     (rad: number) => (rad * 180) / Math.PI;
 
+export function calculateGreatCircleDistanceKm(start: ICoordinates, end: ICoordinates): number {
+    const earthRadiusKm = 6371;
+    const lat1 = toRad(start.latitude);
+    const lon1 = toRad(start.longitude);
+    const lat2 = toRad(end.latitude);
+    const lon2 = toRad(end.longitude);
+
+    const a =
+        Math.sin((lat2 - lat1) / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) * Math.sin((lon2 - lon1) / 2) ** 2;
+
+    return earthRadiusKm * 2 * Math.asin(Math.sqrt(a));
+}
+
 export function interpolateGreatCircle(
     start: ICoordinates,
     end: ICoordinates,

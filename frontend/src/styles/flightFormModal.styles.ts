@@ -9,6 +9,10 @@ export const styles = StyleSheet.create({
         paddingVertical: 10,
         backgroundColor: "#fff",
     },
+    readOnlyInput: {
+        backgroundColor: "#f5f7fa",
+        color: "#52616f",
+    },
     pickerWrap: {
         borderWidth: 1,
         borderColor: "#d7d7d7",

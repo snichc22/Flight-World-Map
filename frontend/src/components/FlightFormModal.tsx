@@ -6,6 +6,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import {CreateFlightDTO, SeatClass} from "../models/types";
 import {IAirport} from "../models/interfaces";
 import {styles} from "../styles/flightFormModal.styles";
+import {calculateGreatCircleDistanceKm} from "../utils/greatCircle";
 
 type Props = {
     visible: boolean;
@@ -23,6 +24,13 @@ const EMPTY_AIRPORT: IAirport = {
 
 // const {airports, setAirports} = useAirportsStore();
 let airports: any[] | null = null;
+
+function estimateDurationMinutes(distanceKm: number) {
+    const averageCruiseSpeedKmH = 850;
+    const taxiAndBufferMinutes = 30;
+
+    return Math.round((distanceKm / averageCruiseSpeedKmH) * 60 + taxiAndBufferMinutes);
+}
 
 export function FlightFormModal({visible, onClose, onSubmit}: Props) {
     const [flightNumber, setFlightNumber] = useState("");
@@ -47,6 +55,25 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
             fetchAirportInfo(arrival.iataCode.trim(), false);
         }
     }, [arrival.iataCode]);
+
+    useEffect(() => {
+        const coordinatesAreReady =
+            departure.iataCode.trim().length === 3 &&
+            arrival.iataCode.trim().length === 3;
+
+        if (coordinatesAreReady) {
+            const calculatedDistanceKm = calculateGreatCircleDistanceKm(departure.coordinates, arrival.coordinates);
+            setDistanceKm(String(Math.round(calculatedDistanceKm)));
+            setDurationMinutes(String(estimateDurationMinutes(calculatedDistanceKm)));
+        }
+    }, [
+        arrival.coordinates.latitude,
+        arrival.coordinates.longitude,
+        arrival.iataCode,
+        departure.coordinates.latitude,
+        departure.coordinates.longitude,
+        departure.iataCode,
+    ]);
 
     async function fetchAirportInfo(iataCode: string, isDeparture: boolean) {
         try {
@@ -364,9 +391,8 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                             <Field label="Distance (km)">
                                 <TextInput
                                     value={distanceKm}
-                                    onChangeText={setDistanceKm}
-                                    keyboardType="numeric"
-                                    style={styles.inputStyle}
+                                    editable={false}
+                                    style={[styles.inputStyle, styles.readOnlyInput]}
                                 />
                             </Field>
                         </View>
