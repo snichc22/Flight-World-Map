@@ -61,21 +61,49 @@ router.get("/stats", async (req: Request, res: Response) => {
                 $group: {
                     _id: null,
                     totalFlights: { $sum: 1 },
-                    totalDistance: { $sum: "$distanceKm" },
-                    totalDuration: { $sum: "$durationMinutes" }
+                    totalDistanceKm: {$sum: "$distanceKm"},
+                    totalDurationMinutes: {$sum: "$durationMinutes"}
                 }
             }
         ]);
+        const flights = await Flight.find({}, "departure arrival").lean();
 
-        if (stats.length > 0) {
-            res.json({
+        const countries = flights.flatMap((flight) => [
+            flight.departure.country,
+            flight.arrival.country,
+        ]);
+
+        const countryCounts = countries.reduce<Record<string, number>>((acc, country) => {
+            acc[country] = (acc[country] ?? 0) + 1;
+            return acc;
+        }, {});
+
+        const airportCodes = new Set(
+            flights.flatMap((flight) => [
+                flight.departure.iataCode,
+                flight.arrival.iataCode,
+            ])
+        );
+
+        const mostVisitedCountry =
+            Object.entries(countryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+
+        return res.json({
+            success: true,
+            data: stats.length > 0 ? {
                 totalFlights: stats[0].totalFlights,
-                totalDistance: stats[0].totalDistance,
-                totalDuration: stats[0].totalDuration
-            });
-        } else {
-            res.json({ totalFlights: 0, totalDistance: 0, totalDuration: 0 });
-        }
+                totalDistanceKm: stats[0].totalDistanceKm,
+                totalDurationMinutes: stats[0].totalDurationMinutes,
+                mostVisitedCountry,
+                uniqueAirports: airportCodes.size
+            } : {
+                totalFlights: 0,
+                totalDistanceKm: 0,
+                totalDurationMinutes: 0,
+                mostVisitedCountry: "",
+                uniqueAirports: 0
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch stats" });
     }
