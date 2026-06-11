@@ -1,4 +1,3 @@
-import {Document} from "mongoose";
 import {SeatClass} from "./types";
 
 // Koordinaten eines Ortes
@@ -17,7 +16,8 @@ export interface IAirport {
 }
 
 // Flug-Eintrag
-export interface IFlight extends Document {
+export interface IFlight {
+    _id?: string;
     flightNumber: string;
     airline: string;
     departure: IAirport;
