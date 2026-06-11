@@ -27,6 +27,7 @@ L.Icon.Default.mergeOptions({
 type Props = {
     flights: IFlight[];
     selectedFlight?: IFlight | null;
+    darkMode?: boolean;
     onSelectFlight?: (flight: IFlight) => void;
 };
 
@@ -59,13 +60,23 @@ function FitMapToFlights({flights}: { flights: IFlight[] }) {
     return null;
 }
 
-export const FlightMap = ({flights, selectedFlight, onSelectFlight}: Props) => {
+export const FlightMap = ({flights, selectedFlight, darkMode, onSelectFlight}: Props) => {
+    const tileLayer = darkMode
+        ? {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        }
+        : {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        };
+
     return (
-        <View style={flightMapStyles.container}>
+        <View style={[flightMapStyles.container, darkMode && flightMapStyles.containerDark]}>
             <MapContainer center={[20, 0]} zoom={2} scrollWheelZoom style={flightMapStyles.map}>
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution={tileLayer.attribution}
+                    url={tileLayer.url}
                 />
 
                 <FitMapToFlights flights={flights}/>
@@ -84,7 +95,7 @@ export const FlightMap = ({flights, selectedFlight, onSelectFlight}: Props) => {
                             <Polyline
                                 positions={path.map((point) => [point.latitude, point.longitude] as [number, number])}
                                 weight={selected ? 4 : 2}
-                                color={selected ? "#1976d2" : "#4a90e2"}
+                                color={selected ? "#5d9cec" : darkMode ? "#7dd3fc" : "#4a90e2"}
                             />
 
                             <Marker

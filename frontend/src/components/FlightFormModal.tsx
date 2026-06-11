@@ -1,15 +1,17 @@
-import React, {useMemo, useState, useEffect} from "react";
-import {Modal, Pressable, ScrollView, Text, TextInput, View, Platform} from "react-native";
+import React, {useEffect, useMemo, useState} from "react";
+import {Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import {Picker} from "@react-native-picker/picker";
-const StyledPicker = Picker as any;
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {CreateFlightDTO, SeatClass} from "../models/types";
 import {IAirport} from "../models/interfaces";
 import {styles} from "../styles/flightFormModal.styles";
 import {calculateGreatCircleDistanceKm} from "../utils/greatCircle";
 
+const StyledPicker = Picker as any;
+
 type Props = {
     visible: boolean;
+    darkMode?: boolean;
     onClose: () => void;
     onSubmit: (flight: CreateFlightDTO) => Promise<void> | void;
 };
@@ -32,7 +34,7 @@ function estimateDurationMinutes(distanceKm: number) {
     return Math.round((distanceKm / averageCruiseSpeedKmH) * 60 + taxiAndBufferMinutes);
 }
 
-export function FlightFormModal({visible, onClose, onSubmit}: Props) {
+export function FlightFormModal({visible, darkMode, onClose, onSubmit}: Props) {
     const [flightNumber, setFlightNumber] = useState("");
     const [airline, setAirline] = useState("");
     const [departure, setDeparture] = useState<IAirport>(EMPTY_AIRPORT);
@@ -144,45 +146,68 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
         onClose();
     }
 
+    const inputStyle = [styles.inputStyle, darkMode && styles.inputStyleDark];
+    const readOnlyInputStyle = [styles.inputStyle, styles.readOnlyInput, darkMode && styles.readOnlyInputDark];
+    const datePressableStyle = [styles.inputStyle, styles.datePressable, darkMode && styles.inputStyleDark];
+    const dateTextStyle = [styles.dateText, darkMode && styles.dateTextDark];
+    const pickerWrapStyle = [styles.pickerWrap, styles.pickerWrapCentered, darkMode && styles.pickerWrapDark];
+    const pickerStyle = [styles.pickerStyle, darkMode && styles.pickerStyleDark];
+    const pickerItemColor = darkMode ? "#f4f7fb" : undefined;
+    const placeholderColor = darkMode ? "#a8b3c7" : undefined;
+    const dateInputWebStyle = {
+        ...StyleSheet.flatten([
+            styles.dateInputWeb,
+            darkMode && styles.dateInputWebDark,
+        ]),
+        ...(darkMode ? {colorScheme: "dark"} : {}),
+    };
+
     return (
         <>
             <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-                <ScrollView contentContainerStyle={styles.scrollContainer}>
-                    <Text style={styles.modalTitle}>
+                <ScrollView
+                    style={[styles.modalBody, darkMode && styles.modalBodyDark]}
+                    contentContainerStyle={styles.scrollContainer}
+                >
+                    <Text style={[styles.modalTitle, darkMode && styles.modalTitleDark]}>
                         Add Flight
                     </Text>
 
                     <View style={styles.row}>
                         <View style={styles.flex1}>
-                            <Field label="Flight Number">
-                                <TextInput value={flightNumber} onChangeText={setFlightNumber} style={styles.inputStyle}/>
+                            <Field label="Flight Number" darkMode={darkMode}>
+                                <TextInput value={flightNumber} onChangeText={setFlightNumber}
+                                           placeholderTextColor={placeholderColor} style={inputStyle}/>
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Airline">
-                                <TextInput value={airline} onChangeText={setAirline} style={styles.inputStyle}/>
+                            <Field label="Airline" darkMode={darkMode}>
+                                <TextInput value={airline} onChangeText={setAirline}
+                                           placeholderTextColor={placeholderColor} style={inputStyle}/>
                             </Field>
                         </View>
                     </View>
 
-                    <Text style={styles.sectionTitle}>Departure</Text>
+                    <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Departure</Text>
                     <View style={styles.row}>
                         <View style={styles.flex04}>
-                            <Field label="IATA">
+                            <Field label="IATA" darkMode={darkMode}>
                                 <TextInput
                                     value={departure.iataCode}
                                     onChangeText={(v) => setDeparture({...departure, iataCode: v.toUpperCase()})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                     maxLength={3}
                                 />
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Name">
+                            <Field label="Name" darkMode={darkMode}>
                                 <TextInput
                                     value={departure.name}
                                     onChangeText={(v) => setDeparture({...departure, name: v})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
@@ -190,20 +215,22 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
 
                     <View style={styles.row}>
                         <View style={styles.flex1}>
-                            <Field label="City">
+                            <Field label="City" darkMode={darkMode}>
                                 <TextInput
                                     value={departure.city}
                                     onChangeText={(v) => setDeparture({...departure, city: v})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Country">
+                            <Field label="Country" darkMode={darkMode}>
                                 <TextInput
                                     value={departure.country}
                                     onChangeText={(v) => setDeparture({...departure, country: v})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
@@ -211,7 +238,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
 
                     <View style={styles.row}>
                         <View style={styles.flex1}>
-                            <Field label="Latitude">
+                            <Field label="Latitude" darkMode={darkMode}>
                                 <TextInput
                                     value={String(departure.coordinates.latitude)}
                                     onChangeText={(v) =>
@@ -221,12 +248,13 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                         })
                                     }
                                     keyboardType="numeric"
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Longitude">
+                            <Field label="Longitude" darkMode={darkMode}>
                                 <TextInput
                                     value={String(departure.coordinates.longitude)}
                                     onChangeText={(v) =>
@@ -236,30 +264,33 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                         })
                                     }
                                     keyboardType="numeric"
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
                     </View>
 
-                    <Text style={styles.sectionTitle}>Arrival</Text>
+                    <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Arrival</Text>
                     <View style={styles.row}>
                         <View style={styles.flex04}>
-                            <Field label="IATA">
+                            <Field label="IATA" darkMode={darkMode}>
                                 <TextInput
                                     value={arrival.iataCode}
                                     onChangeText={(v) => setArrival({...arrival, iataCode: v.toUpperCase()})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                     maxLength={3}
                                 />
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Name">
+                            <Field label="Name" darkMode={darkMode}>
                                 <TextInput
                                     value={arrival.name}
                                     onChangeText={(v) => setArrival({...arrival, name: v})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
@@ -267,20 +298,22 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
 
                     <View style={styles.row}>
                         <View style={styles.flex1}>
-                            <Field label="City">
+                            <Field label="City" darkMode={darkMode}>
                                 <TextInput
                                     value={arrival.city}
                                     onChangeText={(v) => setArrival({...arrival, city: v})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Country">
+                            <Field label="Country" darkMode={darkMode}>
                                 <TextInput
                                     value={arrival.country}
                                     onChangeText={(v) => setArrival({...arrival, country: v})}
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
@@ -288,7 +321,7 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
 
                     <View style={styles.row}>
                         <View style={styles.flex1}>
-                            <Field label="Latitude">
+                            <Field label="Latitude" darkMode={darkMode}>
                                 <TextInput
                                     value={String(arrival.coordinates.latitude)}
                                     onChangeText={(v) =>
@@ -298,12 +331,13 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                         })
                                     }
                                     keyboardType="numeric"
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Longitude">
+                            <Field label="Longitude" darkMode={darkMode}>
                                 <TextInput
                                     value={String(arrival.coordinates.longitude)}
                                     onChangeText={(v) =>
@@ -313,16 +347,17 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                         })
                                     }
                                     keyboardType="numeric"
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
                     </View>
 
-                    <Text style={styles.sectionTitle}>Flight Details</Text>
+                    <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Flight Details</Text>
                     <View style={styles.row}>
                         <View style={styles.flex1}>
-                            <Field label="Date">
+                            <Field label="Date" darkMode={darkMode}>
                                 {Platform.OS === 'web' ? (
                                     React.createElement('input', {
                                         type: 'date',
@@ -332,15 +367,15 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                                 setDate(new Date(e.target.value));
                                             }
                                         },
-                                        style: styles.dateInputWeb as any
+                                        style: dateInputWebStyle as any
                                     })
                                 ) : (
                                     <>
                                         <Pressable
                                             onPress={() => setShowDatePicker(true)}
-                                            style={[styles.inputStyle, styles.datePressable]}
+                                            style={datePressableStyle}
                                         >
-                                            <Text style={styles.dateText}>
+                                            <Text style={dateTextStyle}>
                                                 {new Date(date.getTime() - (date.getTimezoneOffset() * 60 * 1000))
                                                     .toISOString()
                                                     .slice(0, 10)}
@@ -364,12 +399,17 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Seat Class">
-                                <View style={[styles.pickerWrap, styles.pickerWrapCentered]}>
-                                    <StyledPicker style={styles.pickerStyle} selectedValue={seatClass} onValueChange={(v: SeatClass) => setSeatClass(v)}>
-                                        <StyledPicker.Item label="Economy" value="Economy"/>
-                                        <StyledPicker.Item label="Business" value="Business"/>
-                                        <StyledPicker.Item label="First" value="First"/>
+                            <Field label="Seat Class" darkMode={darkMode}>
+                                <View style={pickerWrapStyle}>
+                                    <StyledPicker
+                                        style={pickerStyle}
+                                        dropdownIconColor={pickerItemColor}
+                                        selectedValue={seatClass}
+                                        onValueChange={(v: SeatClass) => setSeatClass(v)}
+                                    >
+                                        <StyledPicker.Item label="Economy" value="Economy" color={pickerItemColor}/>
+                                        <StyledPicker.Item label="Business" value="Business" color={pickerItemColor}/>
+                                        <StyledPicker.Item label="First" value="First" color={pickerItemColor}/>
                                     </StyledPicker>
                                 </View>
                             </Field>
@@ -378,38 +418,42 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
 
                     <View style={styles.row}>
                         <View style={styles.flex1}>
-                            <Field label="Duration (min)">
+                            <Field label="Duration (min)" darkMode={darkMode}>
                                 <TextInput
                                     value={durationMinutes}
                                     onChangeText={setDurationMinutes}
                                     keyboardType="numeric"
-                                    style={styles.inputStyle}
+                                    placeholderTextColor={placeholderColor}
+                                    style={inputStyle}
                                 />
                             </Field>
                         </View>
                         <View style={styles.flex1}>
-                            <Field label="Distance (km)">
+                            <Field label="Distance (km)" darkMode={darkMode}>
                                 <TextInput
                                     value={distanceKm}
                                     editable={false}
-                                    style={[styles.inputStyle, styles.readOnlyInput]}
+                                    style={readOnlyInputStyle}
                                 />
                             </Field>
                         </View>
                     </View>
 
-                    <Field label="Notes">
+                    <Field label="Notes" darkMode={darkMode}>
                         <TextInput
                             value={notes}
                             onChangeText={setNotes}
-                            style={[styles.inputStyle, styles.notesInput]}
+                            placeholderTextColor={placeholderColor}
+                            style={[styles.inputStyle, styles.notesInput, darkMode && styles.inputStyleDark]}
                             multiline
                         />
                     </Field>
 
                     <View style={styles.buttonRow}>
-                        <Pressable onPress={onClose} style={[styles.buttonStyle, styles.cancelButton]}>
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                        <Pressable onPress={onClose}
+                                   style={[styles.buttonStyle, styles.cancelButton, darkMode && styles.cancelButtonDark]}>
+                            <Text
+                                style={[styles.cancelButtonText, darkMode && styles.cancelButtonTextDark]}>Cancel</Text>
                         </Pressable>
 
                         <Pressable
@@ -429,10 +473,10 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
     );
 }
 
-function Field({label, children}: { label: string; children: React.ReactNode }) {
+function Field({label, darkMode, children}: { label: string; darkMode?: boolean; children: React.ReactNode }) {
     return (
         <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>{label}</Text>
+            <Text style={[styles.fieldLabel, darkMode && styles.fieldLabelDark]}>{label}</Text>
             {children}
         </View>
     );

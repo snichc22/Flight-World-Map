@@ -6,9 +6,17 @@ export const styles = StyleSheet.create({
         ...globalStyles.cardCompact,
         marginBottom: 12,
     },
+    cardDark: {
+        backgroundColor: "#202b40",
+        borderColor: "#3a465d",
+    },
     cardSelected: {
         backgroundColor: "#e8f2ff",
         borderColor: "#6aa9ff",
+    },
+    cardSelectedDark: {
+        backgroundColor: "#17375f",
+        borderColor: "#5d9cec",
     },
     cardContainer: globalStyles.rowBetween,
     cardContent: {
@@ -19,17 +27,29 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "700",
     },
+    flightTitleDark: {
+        color: "#f4f7fb",
+    },
     routeText: {
         marginTop: 4,
         color: "#444",
+    },
+    routeTextDark: {
+        color: "#cbd5e1",
     },
     detailText: {
         marginTop: 4,
         color: "#666",
     },
+    detailTextDark: {
+        color: "#a8b3c7",
+    },
     notesText: {
         marginTop: 4,
         color: "#777",
+    },
+    notesTextDark: {
+        color: "#94a3b8",
     },
     deleteBtn: {
         alignSelf: "flex-start",

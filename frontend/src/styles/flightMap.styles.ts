@@ -9,6 +9,9 @@ export const flightMapStyles = StyleSheet.create({
         position: "relative",
         flex: 1,
     },
+    containerDark: {
+        backgroundColor: "#031826",
+    },
     map: {
         width: "100%",
         height: "100%",

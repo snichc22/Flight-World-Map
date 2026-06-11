@@ -47,6 +47,7 @@ export default function App() {
     const [stats, setStats] = useState<IFlightStats | null>(null);
     const [yearInput, setYearInput] = useState("");
     const [countries, setCountries] = useState<string[]>([]);
+    const [darkMode, setDarkMode] = useState(false);
 
     async function loadFlights() {
         setLoading(true);
@@ -147,49 +148,71 @@ export default function App() {
         () => `${flights.length} flight${flights.length === 1 ? "" : "s"}`,
         [flights.length]
     );
+    const filterSelectStyle = {
+        width: "100%",
+        height: 50,
+        boxSizing: "border-box",
+        border: "none",
+        outline: "none",
+        padding: "0 12px",
+        backgroundColor: darkMode ? "#111827" : "#fff",
+        color: darkMode ? "#f4f7fb" : "#102a43",
+        fontSize: 14,
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        colorScheme: darkMode ? "dark" : "light",
+    } as any;
+    const filterOptionStyle = {
+        backgroundColor: darkMode ? "#111827" : "#fff",
+        color: darkMode ? "#f4f7fb" : "#102a43",
+    } as any;
 
     return (
-        <SafeAreaView style={styles.safe}>
+        <SafeAreaView style={[styles.safe, darkMode && styles.safeDark]}>
             <View style={[styles.container, {flex: 1}]}>
-                <View style={[styles.card, {flex: 65, marginTop: -16, zIndex: 0}]}>
+                <View style={[styles.card, darkMode && styles.cardDark, {flex: 65, marginTop: -16, zIndex: 0}]}>
                     <FlightMap
                         flights={flights}
                         selectedFlight={selectedFlight}
+                        darkMode={darkMode}
                         onSelectFlight={(flight) => setSelectedFlight(flight)}
                     />
                 </View>
 
-                <Text style={styles.title}>Flight World Map</Text>
+                <Text style={[styles.title, darkMode && styles.titleDark]}>Flight World Map</Text>
 
                 {stats && (
-                    <View style={[styles.sectionCard, styles.topLeftCard]}>
-                        <Text style={styles.sectionTitle}>Stats</Text>
+                    <View style={[styles.sectionCard, darkMode && styles.sectionCardDark, styles.topLeftCard]}>
+                        <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Stats</Text>
 
                         <View style={[styles.statsCard]}>
-                            <Stat label="Flights" value={stats.totalFlights.toString()}/>
-                            <Stat label="Distance" value={`${stats.totalDistanceKm.toFixed(0)} km`}/>
-                            <Stat label="Duration" value={`${stats.totalDurationMinutes.toFixed(0)} min`}/>
-                            <Stat label="Unique Airports" value={stats.uniqueAirports.toString()}/>
-                            <Stat label="Top Country" value={stats.mostVisitedCountry || "-"}/>
+                            <Stat label="Flights" value={stats.totalFlights.toString()} darkMode={darkMode}/>
+                            <Stat label="Distance" value={`${stats.totalDistanceKm.toFixed(0)} km`}
+                                  darkMode={darkMode}/>
+                            <Stat label="Duration" value={`${stats.totalDurationMinutes.toFixed(0)} min`}
+                                  darkMode={darkMode}/>
+                            <Stat label="Unique Airports" value={stats.uniqueAirports.toString()} darkMode={darkMode}/>
+                            <Stat label="Top Country" value={stats.mostVisitedCountry || "-"} darkMode={darkMode}/>
                         </View>
                     </View>
                 )}
 
                 <View style={styles.topRightCard}>
-                    <View style={styles.sectionCard}>
-                        <Text style={styles.sectionTitle}>Filters</Text>
+                    <View style={[styles.sectionCard, darkMode && styles.sectionCardDark]}>
+                        <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Filters</Text>
 
                         <TextInput
                             placeholder="Search airline, city, airport, ..."
+                            placeholderTextColor={darkMode ? "#a8b3c7" : undefined}
                             value={filter.searchQuery}
                             onChangeText={(searchQuery) => setFilter((prev) => ({...prev, searchQuery}))}
-                            style={styles.input}
+                            style={[styles.input, darkMode && styles.inputDark]}
                         />
 
                         <View style={styles.row}>
                             <View style={styles.flex1}>
                                 <TextInput
                                     placeholder="Year (e.g. 2026)"
+                                    placeholderTextColor={darkMode ? "#a8b3c7" : undefined}
                                     value={yearInput}
                                     onChangeText={(v) => {
                                         setYearInput(v);
@@ -200,39 +223,110 @@ export default function App() {
                                         }));
                                     }}
                                     keyboardType="numeric"
-                                    style={styles.input}
+                                    style={[styles.input, darkMode && styles.inputDark]}
                                 />
                             </View>
 
                             <View style={styles.flex1}>
-                                <View style={styles.pickerWrap}>
-                                    <StyledPicker
-                                        style={styles.picker}
-                                        selectedValue={filter.seatClass}
-                                        onValueChange={(seatClass: any) => setFilter((prev) => ({...prev, seatClass}))}
-                                    >
-                                        <StyledPicker.Item label="All Classes" value="All"/>
-                                        <StyledPicker.Item label="Economy" value="Economy"/>
-                                        <StyledPicker.Item label="Business" value="Business"/>
-                                        <StyledPicker.Item label="First" value="First"/>
-                                    </StyledPicker>
+                                <View style={[styles.pickerWrap, darkMode && styles.pickerWrapDark]}>
+                                    {Platform.OS === "web" ? (
+                                        React.createElement(
+                                            "select",
+                                            {
+                                                value: filter.seatClass,
+                                                onChange: (event: any) =>
+                                                    setFilter((prev) => ({...prev, seatClass: event.target.value})),
+                                                style: filterSelectStyle,
+                                            },
+                                            [
+                                                React.createElement("option", {
+                                                    key: "All",
+                                                    value: "All",
+                                                    style: filterOptionStyle
+                                                }, "All Classes"),
+                                                React.createElement("option", {
+                                                    key: "Economy",
+                                                    value: "Economy",
+                                                    style: filterOptionStyle
+                                                }, "Economy"),
+                                                React.createElement("option", {
+                                                    key: "Business",
+                                                    value: "Business",
+                                                    style: filterOptionStyle
+                                                }, "Business"),
+                                                React.createElement("option", {
+                                                    key: "First",
+                                                    value: "First",
+                                                    style: filterOptionStyle
+                                                }, "First"),
+                                            ]
+                                        )
+                                    ) : (
+                                        <StyledPicker
+                                            style={[styles.picker, darkMode && styles.pickerDark]}
+                                            dropdownIconColor={darkMode ? "#f4f7fb" : undefined}
+                                            selectedValue={filter.seatClass}
+                                            onValueChange={(seatClass: any) => setFilter((prev) => ({
+                                                ...prev,
+                                                seatClass
+                                            }))}
+                                        >
+                                            <StyledPicker.Item label="All Classes" value="All"
+                                                               color={darkMode ? "#f4f7fb" : undefined}/>
+                                            <StyledPicker.Item label="Economy" value="Economy"
+                                                               color={darkMode ? "#f4f7fb" : undefined}/>
+                                            <StyledPicker.Item label="Business" value="Business"
+                                                               color={darkMode ? "#f4f7fb" : undefined}/>
+                                            <StyledPicker.Item label="First" value="First"
+                                                               color={darkMode ? "#f4f7fb" : undefined}/>
+                                        </StyledPicker>
+                                    )}
                                 </View>
                             </View>
                         </View>
 
-                        <View style={styles.pickerWrap}>
-                            <StyledPicker
-                                style={styles.picker}
-                                selectedValue={filter.country || ""}
-                                onValueChange={(country: any) => {
-                                    setFilter((prev) => ({...prev, country: country || null}));
-                                }}
-                            >
-                                <StyledPicker.Item label="All Countries" value=""/>
-                                {countries.map((c) => (
-                                    <StyledPicker.Item key={c} label={c} value={c}/>
-                                ))}
-                            </StyledPicker>
+                        <View style={[styles.pickerWrap, darkMode && styles.pickerWrapDark]}>
+                            {Platform.OS === "web" ? (
+                                React.createElement(
+                                    "select",
+                                    {
+                                        value: filter.country || "",
+                                        onChange: (event: any) =>
+                                            setFilter((prev) => ({...prev, country: event.target.value || null})),
+                                        style: filterSelectStyle,
+                                    },
+                                    [
+                                        React.createElement("option", {
+                                            key: "",
+                                            value: "",
+                                            style: filterOptionStyle
+                                        }, "All Countries"),
+                                        ...countries.map((country) =>
+                                            React.createElement("option", {
+                                                key: country,
+                                                value: country,
+                                                style: filterOptionStyle,
+                                            }, country)
+                                        ),
+                                    ]
+                                )
+                            ) : (
+                                <StyledPicker
+                                    style={[styles.picker, darkMode && styles.pickerDark]}
+                                    dropdownIconColor={darkMode ? "#f4f7fb" : undefined}
+                                    selectedValue={filter.country || ""}
+                                    onValueChange={(country: any) => {
+                                        setFilter((prev) => ({...prev, country: country || null}));
+                                    }}
+                                >
+                                    <StyledPicker.Item label="All Countries" value=""
+                                                       color={darkMode ? "#f4f7fb" : undefined}/>
+                                    {countries.map((c) => (
+                                        <StyledPicker.Item key={c} label={c} value={c}
+                                                           color={darkMode ? "#f4f7fb" : undefined}/>
+                                    ))}
+                                </StyledPicker>
+                            )}
                         </View>
 
                         <View style={styles.row}>
@@ -241,20 +335,26 @@ export default function App() {
                             </Pressable>
 
                             <Pressable
-                                style={styles.secondaryButton}
+                                style={[styles.secondaryButton, darkMode && styles.secondaryButtonDark]}
                                 onPress={() => {
                                     setFilter({searchQuery: "", seatClass: "All", year: null, country: null});
                                     setYearInput("");
                                 }}
                             >
-                                <Text style={styles.secondaryButtonText}>Reset</Text>
+                                <Text
+                                    style={[styles.secondaryButtonText, darkMode && styles.secondaryButtonTextDark]}>Reset</Text>
                             </Pressable>
                         </View>
                     </View>
                 </View>
 
-                <View style={[styles.card, {flex: 35, marginTop: 14, overflow: 'hidden', paddingBottom: 0}]}>
-                    <Text style={styles.sectionTitle}>
+                <View style={[styles.card, darkMode && styles.cardDark, {
+                    flex: 35,
+                    marginTop: 14,
+                    overflow: 'hidden',
+                    paddingBottom: 0
+                }]}>
+                    <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>
                         Flights ({flightCountText})
                     </Text>
 
@@ -273,6 +373,7 @@ export default function App() {
                                     key={flight._id?.toString() ?? `${flight.flightNumber}-${flight.date}`}
                                     flight={flight}
                                     selected={selectedFlight?._id?.toString() === flight._id?.toString()}
+                                    darkMode={darkMode}
                                     onPress={() => setSelectedFlight(flight)}
                                     onDelete={() => confirmDelete(flight._id?.toString())}
                                 />
@@ -282,8 +383,19 @@ export default function App() {
                 </View>
             </View>
 
+            <Pressable
+                accessibilityLabel={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                onPress={() => setDarkMode((prev) => !prev)}
+                style={[styles.themeToggle, darkMode && styles.themeToggleDark]}
+            >
+                <Text style={[styles.themeToggleText, darkMode && styles.themeToggleTextDark]}>
+                    {darkMode ? "☀" : "☾"}
+                </Text>
+            </Pressable>
+
             <FlightFormModal
                 visible={showForm}
+                darkMode={darkMode}
                 onClose={() => setShowForm(false)}
                 onSubmit={handleCreateFlight}
             />
@@ -291,11 +403,11 @@ export default function App() {
     );
 }
 
-function Stat({label, value}: { label: string; value: string }) {
+function Stat({label, value, darkMode}: { label: string; value: string; darkMode: boolean }) {
     return (
-        <View style={styles.statItem}>
-            <Text style={styles.statLabel}>{label}</Text>
-            <Text style={styles.statValue}>{value}</Text>
+        <View style={[styles.statItem, darkMode && styles.statItemDark]}>
+            <Text style={[styles.statLabel, darkMode && styles.statLabelDark]}>{label}</Text>
+            <Text style={[styles.statValue, darkMode && styles.statValueDark]}>{value}</Text>
         </View>
     );
 }
