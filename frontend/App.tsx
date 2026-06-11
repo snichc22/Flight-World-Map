@@ -5,7 +5,7 @@ import {FlightCard} from "./src/components/FlightCard";
 import {FlightFormModal} from "./src/components/FlightFormModal";
 import {IFlight, IFlightFilter, IFlightStats} from "./src/models/interfaces";
 import {CreateFlightDTO} from "./src/models/types";
-import {ActivityIndicator, Alert, Animated, Pressable, SafeAreaView, Text, TextInput, View} from "react-native";
+import {ActivityIndicator, Alert, Animated, Platform, Pressable, SafeAreaView, Text, TextInput, View} from "react-native";
 import {Picker} from "@react-native-picker/picker";
 import {styles} from "./src/styles/app.styles";
 
@@ -80,6 +80,25 @@ export default function App() {
         } catch (e: any) {
             Alert.alert("Error", e?.response?.data?.message ?? e.message ?? "Could not delete flight");
         }
+    }
+
+    function confirmDelete(id?: string) {
+        if (!id) return;
+
+        if (Platform.OS === "web") {
+            const confirmed = (globalThis as any).confirm?.("Remove this flight permanently?") ?? false;
+            if (confirmed) void handleDelete(id);
+            return;
+        }
+
+        Alert.alert("Delete flight", "Remove this flight permanently?", [
+            {text: "Cancel", style: "cancel"},
+            {
+                text: "Delete",
+                style: "destructive",
+                onPress: () => handleDelete(id),
+            },
+        ]);
     }
 
     const flightCountText = useMemo(
@@ -204,16 +223,7 @@ export default function App() {
                                 flight={flight}
                                 selected={selectedFlight?._id?.toString() === flight._id?.toString()}
                                 onPress={() => setSelectedFlight(flight)}
-                                onDelete={() =>
-                                    Alert.alert("Delete flight", "Remove this flight permanently?", [
-                                        {text: "Cancel", style: "cancel"},
-                                        {
-                                            text: "Delete",
-                                            style: "destructive",
-                                            onPress: () => handleDelete(flight._id?.toString()),
-                                        },
-                                    ])
-                                }
+                                onDelete={() => confirmDelete(flight._id?.toString())}
                             />
                         ))
                     )}

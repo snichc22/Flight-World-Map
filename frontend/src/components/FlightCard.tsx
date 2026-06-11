@@ -12,9 +12,9 @@ type Props = {
 
 export const FlightCard = ({flight, selected, onPress, onDelete}: Props) => {
     return (
-        <Pressable onPress={onPress} style={[styles.card, selected && styles.cardSelected]}>
+        <View style={[styles.card, selected && styles.cardSelected]}>
             <View style={styles.cardContainer}>
-                <View style={styles.cardContent}>
+                <Pressable onPress={onPress} style={styles.cardContent}>
                     <Text style={styles.flightTitle}>
                         {flight.flightNumber} - {flight.airline}
                     </Text>
@@ -32,7 +32,7 @@ export const FlightCard = ({flight, selected, onPress, onDelete}: Props) => {
                         {flight.distanceKm.toFixed(0)} km - {flight.durationMinutes} min
                     </Text>
                     {!!flight.notes && <Text style={styles.notesText}>{flight.notes}</Text>}
-                </View>
+                </Pressable>
 
                 {onDelete ? (
                     <Pressable onPress={onDelete} style={styles.deleteBtn}>
@@ -40,6 +40,6 @@ export const FlightCard = ({flight, selected, onPress, onDelete}: Props) => {
                     </Pressable>
                 ) : null}
             </View>
-        </Pressable>
+        </View>
     );
 };
