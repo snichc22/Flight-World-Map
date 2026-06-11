@@ -8,10 +8,10 @@ import {CreateFlightDTO} from "./src/models/types";
 import {
     ActivityIndicator,
     Alert,
-    Animated,
     Platform,
     Pressable,
     SafeAreaView,
+    ScrollView,
     Text,
     TextInput,
     View
@@ -20,7 +20,6 @@ import {Picker} from "@react-native-picker/picker";
 import {styles} from "./src/styles/app.styles";
 
 const StyledPicker = Picker as any;
-const ScrollView = Animated.ScrollView;
 
 function getFlightCountries(flights: IFlight[]) {
     return Array.from(
@@ -151,8 +150,8 @@ export default function App() {
 
     return (
         <SafeAreaView style={styles.safe}>
-            <ScrollView contentContainerStyle={styles.container}>
-                <View style={[styles.card, {height: "auto", flex: 1, minHeight: 400}]}>
+            <View style={[styles.container, {flex: 1}]}>
+                <View style={[styles.card, {flex: 65, marginTop: -16, zIndex: 0}]}>
                     <FlightMap
                         flights={flights}
                         selectedFlight={selectedFlight}
@@ -254,32 +253,34 @@ export default function App() {
                     </View>
                 </View>
 
-                <View style={styles.card}>
+                <View style={[styles.card, {flex: 35, marginTop: 14, overflow: 'hidden', paddingBottom: 0}]}>
                     <Text style={styles.sectionTitle}>
                         Flights ({flightCountText})
                     </Text>
 
-                    {loading ? (
-                        <View style={styles.loadingWrapper}>
-                            <ActivityIndicator size="large"/>
-                        </View>
-                    ) : error ? (
-                        <Text style={styles.errorText}>{error}</Text>
-                    ) : flights.length === 0 ? (
-                        <Text style={styles.emptyText}>No flights found.</Text>
-                    ) : (
-                        flights.map((flight) => (
-                            <FlightCard
-                                key={flight._id?.toString() ?? `${flight.flightNumber}-${flight.date}`}
-                                flight={flight}
-                                selected={selectedFlight?._id?.toString() === flight._id?.toString()}
-                                onPress={() => setSelectedFlight(flight)}
-                                onDelete={() => confirmDelete(flight._id?.toString())}
-                            />
-                        ))
-                    )}
+                    <ScrollView style={{flex: 1}} contentContainerStyle={{paddingBottom: 16}}>
+                        {loading ? (
+                            <View style={styles.loadingWrapper}>
+                                <ActivityIndicator size="large"/>
+                            </View>
+                        ) : error ? (
+                            <Text style={styles.errorText}>{error}</Text>
+                        ) : flights.length === 0 ? (
+                            <Text style={styles.emptyText}>No flights found.</Text>
+                        ) : (
+                            flights.map((flight) => (
+                                <FlightCard
+                                    key={flight._id?.toString() ?? `${flight.flightNumber}-${flight.date}`}
+                                    flight={flight}
+                                    selected={selectedFlight?._id?.toString() === flight._id?.toString()}
+                                    onPress={() => setSelectedFlight(flight)}
+                                    onDelete={() => confirmDelete(flight._id?.toString())}
+                                />
+                            ))
+                        )}
+                    </ScrollView>
                 </View>
-            </ScrollView>
+            </View>
 
             <FlightFormModal
                 visible={showForm}

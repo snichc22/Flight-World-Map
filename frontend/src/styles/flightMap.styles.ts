@@ -1,15 +1,13 @@
 import {StyleSheet} from "react-native";
 import {globalStyles} from "./global.styles";
 
-export const getDynamicMapHeight = (height: number) =>
-    height * 0.6;
-
 export const flightMapStyles = StyleSheet.create({
     container: {
         ...globalStyles.card,
         borderRadius: 18,
         overflow: "hidden",
         position: "relative",
+        flex: 1,
     },
     map: {
         width: "100%",

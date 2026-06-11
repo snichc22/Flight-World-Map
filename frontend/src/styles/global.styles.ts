@@ -1,7 +1,10 @@
 import {StyleSheet} from "react-native";
 
 export const globalStyles = StyleSheet.create({
-    screen: {flex: 1, backgroundColor: "#f5f7fb"},
+    screen: {
+        flex: 1,
+        backgroundColor: "#f5f7fb",
+    },
     card: {
         backgroundColor: "#fff",
         borderRadius: 20,
@@ -14,7 +17,7 @@ export const globalStyles = StyleSheet.create({
         elevation: 2,
     },
     sectionCard: {
-        backgroundColor: "#eee",
+        backgroundColor: "#f8f8f8",
         borderRadius: 20,
         padding: 14,
         marginBottom: 14,

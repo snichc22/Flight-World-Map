@@ -5,7 +5,7 @@ import L from "leaflet";
 
 import {IFlight} from "../models/interfaces";
 import {interpolateGreatCircle} from "../utils/greatCircle";
-import {flightMapStyles, getDynamicMapHeight} from "../styles/flightMap.styles";
+import {flightMapStyles} from "../styles/flightMap.styles";
 
 if (typeof document !== "undefined") {
     const leafletCssUrl = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
@@ -32,7 +32,7 @@ type Props = {
 
 function FitMapToFlights({flights}: { flights: IFlight[] }) {
     const map = useMap();
-    const {height, width} = useWindowDimensions();
+    const {width} = useWindowDimensions();
 
     useEffect(() => {
         if (!flights.length) {
@@ -46,19 +46,22 @@ function FitMapToFlights({flights}: { flights: IFlight[] }) {
         ]);
 
         const bounds = L.latLngBounds(points);
+        const horizontalPadding = width * 0.185;
+
         if (bounds.isValid()) {
-            map.fitBounds(bounds, {padding: [40, 40]});
+            map.fitBounds(bounds, {
+                paddingTopLeft: [horizontalPadding, 40],
+                paddingBottomRight: [horizontalPadding, 40],
+            });
         }
-    }, [flights, map]);
+    }, [flights, map, width]);
 
     return null;
 }
 
 export const FlightMap = ({flights, selectedFlight, onSelectFlight}: Props) => {
-    const {height} = useWindowDimensions();
-
     return (
-        <View style={[flightMapStyles.container, {height: getDynamicMapHeight(height)}]}>
+        <View style={flightMapStyles.container}>
             <MapContainer center={[20, 0]} zoom={2} scrollWheelZoom style={flightMapStyles.map}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

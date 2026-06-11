@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
     safe: globalStyles.screen,
     container: {
         padding: 16,
+        marginTop: 20,
         paddingBottom: 32,
     },
     title: {
@@ -16,7 +17,7 @@ export const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: "hidden",
         position: "absolute",
-        top: 52,
+        top: 35,
         alignSelf: "center",
         zIndex: 10,
     },
@@ -54,16 +55,16 @@ export const styles = StyleSheet.create({
     loadingWrapper: {paddingVertical: 24},
     topRightCard: {
         position: "absolute",
-        top: 48,
+        top: 32,
         right: 48,
-        width: "30%",
+        width: "20%",
         zIndex: 1,
     },
     topLeftCard: {
         position: "absolute",
-        top: 48,
+        top: 32,
         left: 48,
-        width: "30%",
+        width: "15%",
         zIndex: 1,
     },
 });
