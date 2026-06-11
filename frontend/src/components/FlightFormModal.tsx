@@ -22,7 +22,7 @@ const EMPTY_AIRPORT: IAirport = {
 };
 
 // const {airports, setAirports} = useAirportsStore();
-let airports: IAirport[] | null = null;
+let airports: any[] | null = null;
 
 export function FlightFormModal({visible, onClose, onSubmit}: Props) {
     const [flightNumber, setFlightNumber] = useState("");
@@ -50,13 +50,14 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
 
     async function fetchAirportInfo(iataCode: string, isDeparture: boolean) {
         try {
-            if (!airports) {
+            if (airports === null) {
                 const res = await fetch("https://raw.githubusercontent.com/mwgg/Airports/master/airports.json");
-                airports = await res.json();
+                const airportData = await res.json();
+                airports = Array.isArray(airportData) ? airportData : Object.values(airportData);
             }
 
             const upperIata = iataCode.toUpperCase();
-            const airport = airports!.find((a: any) => a.iata === upperIata) as any;
+            const airport = airports.find((a) => a.iata === upperIata);
 
             if (airport) {
                 const newInfo = {
@@ -308,12 +309,11 @@ export function FlightFormModal({visible, onClose, onSubmit}: Props) {
                                     })
                                 ) : (
                                     <>
-                                        {/* TODO: Test */}
                                         <Pressable
                                             onPress={() => setShowDatePicker(true)}
                                             style={[styles.inputStyle, styles.datePressable]}
                                         >
-                                            <Text>
+                                            <Text style={styles.dateText}>
                                                 {new Date(date.getTime() - (date.getTimezoneOffset() * 60 * 1000))
                                                     .toISOString()
                                                     .slice(0, 10)}
