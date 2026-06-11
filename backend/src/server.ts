@@ -1,7 +1,7 @@
 import app from "./app";
 import connectDB from "./config/db";
-import { Flight } from "./models/Flight";
-import { mockFlights } from "./data/mock_flights";
+import {Flight} from "./models/Flight";
+import {mockFlights} from "./data/mock_flights";
 
 const PORT = 4000;
 

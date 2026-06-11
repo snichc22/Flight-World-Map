@@ -6,13 +6,13 @@ const router: Router = express.Router();
 // Alle Flüge abrufen (mit optionalen Query-Parametern: ?year=, ?class=, ?search=)
 router.get("/", async (req: Request, res: Response) => {
     try {
-        const { year, class: flightClass, search, country } = req.query;
+        const {year, class: flightClass, search, country} = req.query;
         let query: any = {};
 
         if (year) {
             const startDate = new Date(`${year}-01-01`);
             const endDate = new Date(`${year}-12-31T23:59:59.999Z`);
-            query.date = { $gte: startDate, $lte: endDate };
+            query.date = {$gte: startDate, $lte: endDate};
         }
 
         if (flightClass) {
@@ -21,24 +21,24 @@ router.get("/", async (req: Request, res: Response) => {
 
         if (country) {
             query.$or = [
-                { "departure.country": country },
-                { "arrival.country": country }
+                {"departure.country": country},
+                {"arrival.country": country}
             ];
         }
 
         if (search) {
             const searchRegex = new RegExp(search as string, "i");
             const searchCriteria = [
-                { flightNumber: searchRegex },
-                { airline: searchRegex },
-                { "departure.name": searchRegex },
-                { "arrival.name": searchRegex },
-                { "departure.iataCode": searchRegex },
-                { "arrival.iataCode": searchRegex }
+                {flightNumber: searchRegex},
+                {airline: searchRegex},
+                {"departure.name": searchRegex},
+                {"arrival.name": searchRegex},
+                {"departure.iataCode": searchRegex},
+                {"arrival.iataCode": searchRegex}
             ];
 
             if (query.$or) {
-                query.$and = [ { $or: query.$or }, { $or: searchCriteria } ];
+                query.$and = [{$or: query.$or}, {$or: searchCriteria}];
                 delete query.$or;
             } else {
                 query.$or = searchCriteria;
@@ -46,10 +46,10 @@ router.get("/", async (req: Request, res: Response) => {
         }
 
         const flights =
-            await Flight.find(query).sort({ date: -1 });
+            await Flight.find(query).sort({date: -1});
         res.json(flights);
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch flights" });
+        res.status(500).json({error: "Failed to fetch flights"});
     }
 });
 
@@ -60,7 +60,7 @@ router.get("/stats", async (req: Request, res: Response) => {
             {
                 $group: {
                     _id: null,
-                    totalFlights: { $sum: 1 },
+                    totalFlights: {$sum: 1},
                     totalDistanceKm: {$sum: "$distanceKm"},
                     totalDurationMinutes: {$sum: "$durationMinutes"}
                 }
@@ -105,7 +105,7 @@ router.get("/stats", async (req: Request, res: Response) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch stats" });
+        res.status(500).json({error: "Failed to fetch stats"});
     }
 });
 
@@ -113,10 +113,10 @@ router.get("/stats", async (req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
     try {
         const flight = await Flight.findById(req.params.id);
-        if (!flight) return res.status(404).json({ error: "Flight not found" });
+        if (!flight) return res.status(404).json({error: "Flight not found"});
         return res.json(flight);
     } catch (error) {
-        return res.status(500).json({ error: "Failed to fetch flight" });
+        return res.status(500).json({error: "Failed to fetch flight"});
     }
 });
 
@@ -127,18 +127,18 @@ router.post("/", async (req: Request, res: Response) => {
         const savedFlight = await newFlight.save();
         res.status(201).json(savedFlight);
     } catch (error) {
-        res.status(400).json({ error: "Failed to create flight", details: error });
+        res.status(400).json({error: "Failed to create flight", details: error});
     }
 });
 
 // Flug bearbeiten
 router.put("/:id", async (req: Request, res: Response) => {
     try {
-        const updatedFlight = await Flight.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        if (!updatedFlight) return res.status(404).json({ error: "Flight not found" });
+        const updatedFlight = await Flight.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
+        if (!updatedFlight) return res.status(404).json({error: "Flight not found"});
         return res.json(updatedFlight);
     } catch (error) {
-        return res.status(400).json({ error: "Failed to update flight", details: error });
+        return res.status(400).json({error: "Failed to update flight", details: error});
     }
 });
 
@@ -146,10 +146,10 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
     try {
         const deletedFlight = await Flight.findByIdAndDelete(req.params.id);
-        if (!deletedFlight) return res.status(404).json({ error: "Flight not found" });
-        return res.json({ message: "Flight deleted successfully" });
+        if (!deletedFlight) return res.status(404).json({error: "Flight not found"});
+        return res.json({message: "Flight deleted successfully"});
     } catch (error) {
-        return res.status(500).json({ error: "Failed to delete flight" });
+        return res.status(500).json({error: "Failed to delete flight"});
     }
 });
 

@@ -55,7 +55,7 @@ export function interpolateGreatCircle(
             A * Math.cos(lat1) * Math.sin(lon1) +
             B * Math.cos(lat2) * Math.sin(lon2);
         const z =
-            A * Math.sin(lat1) + 
+            A * Math.sin(lat1) +
             B * Math.sin(lat2);
 
         const lat = Math.atan2(z, Math.sqrt(x * x + y * y));

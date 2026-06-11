@@ -1,4 +1,4 @@
-import { IFlight } from "./interfaces";
+import {IFlight} from "./interfaces";
 
 // Seat-Klasse als Union Type
 export type SeatClass = "Economy" | "Business" | "First";

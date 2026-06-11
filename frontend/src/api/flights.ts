@@ -1,4 +1,4 @@
-import { api } from "./client";
+import {api} from "./client";
 import {IApiResponse, IFlight, IFlightStats} from "../models/interfaces";
 import {CreateFlightDTO} from "../models/types";
 
