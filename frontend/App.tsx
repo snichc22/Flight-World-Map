@@ -12,6 +12,17 @@ import {styles} from "./src/styles/app.styles";
 const StyledPicker = Picker as any;
 const ScrollView = Animated.ScrollView;
 
+function getFlightCountries(flights: IFlight[]) {
+    return Array.from(
+        new Set(
+            flights.flatMap((flight) => [
+                flight.departure.country,
+                flight.arrival.country,
+            ]).filter(Boolean)
+        )
+    ).sort((a, b) => a.localeCompare(b));
+}
+
 export default function App() {
     const [flights, setFlights] = useState<IFlight[]>([]);
     const [filter, setFilter] = useState<IFlightFilter>({
@@ -51,8 +62,18 @@ export default function App() {
         try {
             const data = await getFlightStats();
             setStats(data);
+            console.log("Stats loaded:", data);
         } catch (e) {
             console.log("Stats error:", e);
+        }
+    }
+
+    async function loadCountries() {
+        try {
+            const allFlights = await getFlights();
+            setCountries(getFlightCountries(allFlights));
+        } catch (e) {
+            console.log("Countries error:", e);
         }
     }
 
@@ -61,11 +82,22 @@ export default function App() {
         loadStats();
     }, [filter.searchQuery, filter.seatClass, filter.year, filter.country]);
 
+    useEffect(() => {
+        loadCountries();
+    }, []);
+
+    useEffect(() => {
+        if (filter.country && countries.length > 0 && !countries.includes(filter.country)) {
+            setFilter((prev) => ({...prev, country: null}));
+        }
+    }, [countries, filter.country]);
+
     async function handleCreateFlight(payload: CreateFlightDTO) {
         try {
             await createFlight(payload);
             await loadFlights();
             await loadStats();
+            await loadCountries();
         } catch (e: any) {
             console.error("Error", e?.response?.data?.message ?? e.message ?? "Could not save flight");
         }
@@ -77,6 +109,7 @@ export default function App() {
             await deleteFlight(id);
             await loadFlights();
             await loadStats();
+            await loadCountries();
         } catch (e: any) {
             Alert.alert("Error", e?.response?.data?.message ?? e.message ?? "Could not delete flight");
         }
