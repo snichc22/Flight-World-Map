@@ -2,6 +2,10 @@ import {api} from "./client";
 import {IApiResponse, IFlight, IFlightStats} from "../models/interfaces";
 import {CreateFlightDTO} from "../models/types";
 
+type DeleteFlightResponse = {
+    message: string;
+};
+
 export async function getFlights(params?: {
     year?: number | null;
     seatClass?: string;
@@ -9,7 +13,7 @@ export async function getFlights(params?: {
     country?: string | null;
 }) {
     const response =
-        await api.get<IApiResponse<IFlight[]>>("/flights", {
+        await api.get<IFlight[]>("/flights", {
             params: {
                 year: params?.year ?? undefined,
                 class: params?.seatClass && params.seatClass !== "All" ? params.seatClass : undefined,
@@ -17,18 +21,18 @@ export async function getFlights(params?: {
                 country: params?.country ?? undefined,
             },
         });
-    return (response.data as any).data ?? response.data;
+    return response.data;
 }
 
 export async function createFlight(payload: CreateFlightDTO) {
     const response =
-        await api.post<IApiResponse<IFlight>>("/flights", payload);
-    return response.data.data;
+        await api.post<IFlight>("/flights", payload);
+    return response.data;
 }
 
 export async function deleteFlight(id: string) {
     const response =
-        await api.delete<IApiResponse<null>>(`/flights/${id}`);
+        await api.delete<DeleteFlightResponse>(`/flights/${id}`);
     return response.data;
 }
 

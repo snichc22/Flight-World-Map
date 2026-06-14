@@ -109,7 +109,9 @@ export default function App() {
             await loadStats();
             await loadCountries();
         } catch (e: any) {
-            console.error("Error", e?.response?.data?.message ?? e.message ?? "Could not save flight");
+            const message = e?.response?.data?.message ?? e.message ?? "Could not save flight";
+            console.error("Error", message);
+            Alert.alert("Error", "There was an error while saving the flight.");
         }
     }
 

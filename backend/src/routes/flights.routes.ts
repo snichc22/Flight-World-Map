@@ -1,13 +1,34 @@
 import express, {Request, Response, Router} from "express";
 import Flight from "../models/Flight";
+import {SeatClass} from "../models/types";
 
 const router: Router = express.Router();
+
+type FlightRouteQuery = {
+    date?: { $gte: Date; $lte: Date };
+    seatClass?: SeatClass;
+    $or?: Record<string, string | RegExp>[];
+    $and?: { $or: Record<string, string | RegExp>[] }[];
+};
+
+function getQueryString(value: unknown): string | undefined {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return value.find((item): item is string => typeof item === "string");
+    return undefined;
+}
+
+function isSeatClass(value: string): value is SeatClass {
+    return value === "Economy" || value === "Business" || value === "First";
+}
 
 // Alle Flüge abrufen (mit optionalen Query-Parametern: ?year=, ?class=, ?search=)
 router.get("/", async (req: Request, res: Response) => {
     try {
-        const {year, class: flightClass, search, country} = req.query;
-        let query: any = {};
+        const year = getQueryString(req.query.year);
+        const flightClass = getQueryString(req.query.class);
+        const search = getQueryString(req.query.search);
+        const country = getQueryString(req.query.country);
+        const query: FlightRouteQuery = {};
 
         if (year) {
             const startDate = new Date(`${year}-01-01`);
@@ -15,7 +36,7 @@ router.get("/", async (req: Request, res: Response) => {
             query.date = {$gte: startDate, $lte: endDate};
         }
 
-        if (flightClass) {
+        if (flightClass && isSeatClass(flightClass)) {
             query.seatClass = flightClass;
         }
 
@@ -27,8 +48,8 @@ router.get("/", async (req: Request, res: Response) => {
         }
 
         if (search) {
-            const searchRegex = new RegExp(search as string, "i");
-            const searchCriteria = [
+            const searchRegex = new RegExp(search, "i");
+            const searchCriteria: Record<string, RegExp>[] = [
                 {flightNumber: searchRegex},
                 {airline: searchRegex},
                 {"departure.name": searchRegex},
